@@ -1,5 +1,7 @@
 using System.Reflection;
+using Dorise.Incentive.Application.Approvals.Services;
 using Dorise.Incentive.Application.Common.Behaviors;
+using Dorise.Incentive.Domain.Services;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,6 +31,9 @@ public static class DependencyInjection
 
         // Register FluentValidation
         services.AddValidatorsFromAssembly(assembly);
+
+        // Application Services
+        services.AddScoped<IApprovalWorkflowService, ApprovalWorkflowService>();
 
         return services;
     }

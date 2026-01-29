@@ -27,6 +27,11 @@ public interface IUnitOfWork : IDisposable
     ICalculationRepository Calculations { get; }
 
     /// <summary>
+    /// Gets the approval repository.
+    /// </summary>
+    IApprovalRepository Approvals { get; }
+
+    /// <summary>
     /// Saves all changes made in this unit of work to the database.
     /// </summary>
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

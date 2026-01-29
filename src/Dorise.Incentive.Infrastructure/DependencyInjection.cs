@@ -36,6 +36,7 @@ public static class DependencyInjection
         services.AddScoped<IIncentivePlanRepository, IncentivePlanRepository>();
         services.AddScoped<ICalculationRepository, CalculationRepository>();
         services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+        services.AddScoped<IApprovalRepository, ApprovalRepository>();
 
         // Unit of Work
         services.AddScoped<IUnitOfWork, UnitOfWork>();
