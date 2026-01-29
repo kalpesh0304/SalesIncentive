@@ -4,6 +4,7 @@ using Dorise.Incentive.Application.Dashboard.Services;
 using Dorise.Incentive.Application.Integrations.Services;
 using Dorise.Incentive.Application.Notifications.Services;
 using Dorise.Incentive.Application.Reports.Services;
+using Dorise.Incentive.Application.Security.Services;
 using Dorise.Incentive.Domain.Interfaces;
 using Dorise.Incentive.Infrastructure.Audit;
 using Dorise.Incentive.Infrastructure.Dashboard;
@@ -12,7 +13,9 @@ using Dorise.Incentive.Infrastructure.Notifications;
 using Dorise.Incentive.Infrastructure.Persistence;
 using Dorise.Incentive.Infrastructure.Persistence.Repositories;
 using Dorise.Incentive.Infrastructure.Reports;
+using Dorise.Incentive.Infrastructure.Security;
 using Dorise.Incentive.Infrastructure.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -80,6 +83,25 @@ public static class DependencyInjection
         // Dashboard & Reporting Services
         services.AddScoped<IDashboardService, DashboardService>();
         services.AddScoped<IReportGenerationService, ReportGenerationService>();
+
+        // Security & RBAC Services
+        services.AddScoped<IRoleRepository, RoleRepository>();
+        services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+        services.AddScoped<IAuthorizationService, AuthorizationService>();
+        services.AddScoped<IRoleManagementService, RoleManagementService>();
+        services.AddScoped<IUserRoleService, UserRoleService>();
+        services.AddScoped<ISecurityAuditService, SecurityAuditService>();
+
+        // Authorization Handlers
+        services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
+        services.AddScoped<IAuthorizationHandler, ExtendedPermissionAuthorizationHandler>();
+        services.AddScoped<IAuthorizationHandler, AnyPermissionAuthorizationHandler>();
+
+        // Authorization Policy Provider
+        services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
+
+        // Memory cache for permission caching
+        services.AddMemoryCache();
 
         return services;
     }
