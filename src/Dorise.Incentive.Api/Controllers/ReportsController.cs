@@ -1,5 +1,6 @@
 using Dorise.Incentive.Application.Reports.DTOs;
 using Dorise.Incentive.Application.Reports.Queries;
+using Dorise.Incentive.Application.Reports.Services;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,15 +12,24 @@ namespace Dorise.Incentive.Api.Controllers;
 /// "I'm a unitard!" - Unified reporting endpoints!
 /// </summary>
 [ApiController]
-[Route("api/v1/[controller]")]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/[controller]")]
 [Authorize]
+[Produces("application/json")]
 public class ReportsController : ControllerBase
 {
     private readonly IMediator _mediator;
+    private readonly IReportGenerationService _reportService;
+    private readonly ILogger<ReportsController> _logger;
 
-    public ReportsController(IMediator mediator)
+    public ReportsController(
+        IMediator mediator,
+        IReportGenerationService reportService,
+        ILogger<ReportsController> logger)
     {
         _mediator = mediator;
+        _reportService = reportService;
+        _logger = logger;
     }
 
     /// <summary>
@@ -177,6 +187,169 @@ public class ReportsController : ControllerBase
         return result.Match(
             export => File(export.Content, export.ContentType, export.FileName),
             error => BadRequest(new { Error = error }));
+    }
+    /// <summary>
+    /// Get available report types.
+    /// </summary>
+    [HttpGet("types")]
+    [ProducesResponseType(typeof(IReadOnlyList<ReportTypeInfoDto>), StatusCodes.Status200OK)]
+    public IActionResult GetReportTypes()
+    {
+        var types = _reportService.GetAvailableReportTypes();
+        return Ok(types);
+    }
+
+    /// <summary>
+    /// Generate a report with specified parameters.
+    /// </summary>
+    [HttpPost("generate")]
+    [ProducesResponseType(typeof(GeneratedReportDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GenerateReport(
+        [FromBody] ReportRequestDto request,
+        CancellationToken cancellationToken)
+    {
+        var generatedBy = User.Identity?.Name ?? "System";
+        _logger.LogInformation(
+            "Generating {ReportType} report for period {Period} by {User}",
+            request.ReportType, request.Period, generatedBy);
+
+        var report = await _reportService.GenerateReportAsync(request, generatedBy, cancellationToken);
+
+        if (report.Format != ReportFormats.Json && report.Content != null)
+        {
+            return File(report.Content, report.ContentType!, report.FileName!);
+        }
+
+        return Ok(report);
+    }
+
+    /// <summary>
+    /// Generate incentive summary report.
+    /// </summary>
+    [HttpGet("incentive-summary")]
+    [ProducesResponseType(typeof(PayoutReportDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetIncentiveSummary(
+        [FromQuery] string period,
+        [FromQuery] Guid? departmentId = null,
+        CancellationToken cancellationToken = default)
+    {
+        var report = await _reportService.GenerateIncentiveSummaryAsync(
+            period, departmentId, cancellationToken);
+        return Ok(report);
+    }
+
+    /// <summary>
+    /// Generate achievement summary report.
+    /// </summary>
+    [HttpGet("achievement-summary")]
+    [ProducesResponseType(typeof(AchievementSummaryDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAchievementSummary(
+        [FromQuery] string period,
+        [FromQuery] Guid? departmentId = null,
+        CancellationToken cancellationToken = default)
+    {
+        var report = await _reportService.GenerateAchievementSummaryAsync(
+            period, departmentId, cancellationToken);
+        return Ok(report);
+    }
+
+    /// <summary>
+    /// Generate variance analysis report.
+    /// </summary>
+    [HttpGet("variance-analysis")]
+    [ProducesResponseType(typeof(VarianceAnalysisDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetVarianceAnalysisReport(
+        [FromQuery] string currentPeriod,
+        [FromQuery] string? previousPeriod = null,
+        [FromQuery] Guid? departmentId = null,
+        CancellationToken cancellationToken = default)
+    {
+        var prevPeriod = previousPeriod ?? GetPreviousPeriod(currentPeriod);
+        var report = await _reportService.GenerateVarianceAnalysisAsync(
+            currentPeriod, prevPeriod, departmentId, cancellationToken);
+        return Ok(report);
+    }
+
+    /// <summary>
+    /// Generate forecast report.
+    /// </summary>
+    [HttpGet("forecast")]
+    [ProducesResponseType(typeof(ForecastReportDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetForecast(
+        [FromQuery] int monthsAhead = 6,
+        [FromQuery] Guid? departmentId = null,
+        CancellationToken cancellationToken = default)
+    {
+        var report = await _reportService.GenerateForecastAsync(
+            monthsAhead, departmentId, cancellationToken);
+        return Ok(report);
+    }
+
+    /// <summary>
+    /// Export report to specified format.
+    /// </summary>
+    [HttpPost("export")]
+    [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ExportReport(
+        [FromBody] ReportRequestDto request,
+        [FromQuery] string format = "csv",
+        CancellationToken cancellationToken = default)
+    {
+        var export = await _reportService.ExportReportAsync(request, format, cancellationToken);
+        return File(export.Content, export.ContentType, export.FileName);
+    }
+
+    /// <summary>
+    /// Schedule a report for recurring generation.
+    /// </summary>
+    [HttpPost("schedules")]
+    [Authorize(Roles = "Admin,Manager")]
+    [ProducesResponseType(typeof(ReportScheduleDto), StatusCodes.Status201Created)]
+    public async Task<IActionResult> ScheduleReport(
+        [FromBody] ReportScheduleDto schedule,
+        CancellationToken cancellationToken)
+    {
+        var created = await _reportService.ScheduleReportAsync(schedule, cancellationToken);
+        return CreatedAtAction(nameof(GetScheduledReports), new { id = created.ScheduleId }, created);
+    }
+
+    /// <summary>
+    /// Get all scheduled reports.
+    /// </summary>
+    [HttpGet("schedules")]
+    [ProducesResponseType(typeof(IReadOnlyList<ReportScheduleDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetScheduledReports(CancellationToken cancellationToken)
+    {
+        var schedules = await _reportService.GetScheduledReportsAsync(cancellationToken);
+        return Ok(schedules);
+    }
+
+    /// <summary>
+    /// Cancel a scheduled report.
+    /// </summary>
+    [HttpDelete("schedules/{scheduleId:guid}")]
+    [Authorize(Roles = "Admin,Manager")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> CancelScheduledReport(
+        Guid scheduleId,
+        CancellationToken cancellationToken)
+    {
+        await _reportService.CancelScheduledReportAsync(scheduleId, cancellationToken);
+        return NoContent();
+    }
+
+    private static string GetPreviousPeriod(string period)
+    {
+        if (DateTime.TryParseExact(period + "-01", "yyyy-MM-dd",
+            System.Globalization.CultureInfo.InvariantCulture,
+            System.Globalization.DateTimeStyles.None,
+            out var date))
+        {
+            return date.AddMonths(-1).ToString("yyyy-MM");
+        }
+        return DateTime.UtcNow.AddMonths(-1).ToString("yyyy-MM");
     }
 }
 

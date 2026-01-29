@@ -269,3 +269,142 @@ public record ExportResultDto
     public int RecordCount { get; init; }
     public DateTime GeneratedAt { get; init; }
 }
+
+/// <summary>
+/// Report request parameters.
+/// </summary>
+public record ReportRequestDto
+{
+    public required string ReportType { get; init; }
+    public required string Period { get; init; }
+    public DateTime? FromDate { get; init; }
+    public DateTime? ToDate { get; init; }
+    public Guid? DepartmentId { get; init; }
+    public Guid? PlanId { get; init; }
+    public string Format { get; init; } = "json";
+    public bool IncludeDetails { get; init; } = true;
+    public Dictionary<string, object>? AdditionalParameters { get; init; }
+}
+
+/// <summary>
+/// Generated report result.
+/// </summary>
+public record GeneratedReportDto
+{
+    public required ReportMetadataDto Metadata { get; init; }
+    public required string Format { get; init; }
+    public byte[]? Content { get; init; }
+    public string? ContentType { get; init; }
+    public string? FileName { get; init; }
+    public object? JsonData { get; init; }
+}
+
+/// <summary>
+/// Report metadata.
+/// </summary>
+public record ReportMetadataDto
+{
+    public Guid ReportId { get; init; } = Guid.NewGuid();
+    public required string ReportName { get; init; }
+    public required string ReportType { get; init; }
+    public DateTime GeneratedAt { get; init; } = DateTime.UtcNow;
+    public required string GeneratedBy { get; init; }
+    public required string Period { get; init; }
+    public DateTime? FromDate { get; init; }
+    public DateTime? ToDate { get; init; }
+    public Dictionary<string, object> Parameters { get; init; } = new();
+}
+
+/// <summary>
+/// Report schedule configuration.
+/// </summary>
+public record ReportScheduleDto
+{
+    public Guid ScheduleId { get; init; }
+    public required string ReportType { get; init; }
+    public required string ScheduleName { get; init; }
+    public required string CronExpression { get; init; }
+    public required string Format { get; init; }
+    public IReadOnlyList<string> Recipients { get; init; } = new List<string>();
+    public Dictionary<string, object> Parameters { get; init; } = new();
+    public bool IsActive { get; init; } = true;
+    public DateTime? LastRunAt { get; init; }
+    public DateTime? NextRunAt { get; init; }
+    public string? CreatedBy { get; init; }
+    public DateTime CreatedAt { get; init; }
+}
+
+/// <summary>
+/// Comprehensive incentive report.
+/// </summary>
+public record IncentiveDetailReportDto
+{
+    public required ReportMetadataDto Metadata { get; init; }
+    public required PayoutSummaryDto Summary { get; init; }
+    public IReadOnlyList<PayoutDetailDto> Details { get; init; } = new List<PayoutDetailDto>();
+    public IReadOnlyList<DepartmentAchievementDto> DepartmentBreakdown { get; init; } = new List<DepartmentAchievementDto>();
+    public IReadOnlyList<PlanAchievementDto> PlanBreakdown { get; init; } = new List<PlanAchievementDto>();
+}
+
+/// <summary>
+/// Forecast report.
+/// </summary>
+public record ForecastReportDto
+{
+    public required ReportMetadataDto Metadata { get; init; }
+    public IReadOnlyList<ForecastDataPointDto> ForecastData { get; init; } = new List<ForecastDataPointDto>();
+    public required ForecastSummaryDto Summary { get; init; }
+}
+
+/// <summary>
+/// Forecast data point.
+/// </summary>
+public record ForecastDataPointDto
+{
+    public required string Period { get; init; }
+    public decimal ProjectedIncentive { get; init; }
+    public decimal LowerBound { get; init; }
+    public decimal UpperBound { get; init; }
+    public double ConfidenceLevel { get; init; }
+    public string Currency { get; init; } = "USD";
+}
+
+/// <summary>
+/// Forecast summary.
+/// </summary>
+public record ForecastSummaryDto
+{
+    public decimal ProjectedAnnualTotal { get; init; }
+    public decimal ProjectedNextQuarter { get; init; }
+    public double GrowthTrend { get; init; }
+    public required string TrendDirection { get; init; }
+    public string Currency { get; init; } = "USD";
+}
+
+/// <summary>
+/// Available report types.
+/// </summary>
+public static class ReportTypes
+{
+    public const string IncentiveSummary = "incentive-summary";
+    public const string Performance = "performance";
+    public const string TrendAnalysis = "trend-analysis";
+    public const string PayrollExport = "payroll-export";
+    public const string DepartmentComparison = "department-comparison";
+    public const string EmployeeDetail = "employee-detail";
+    public const string ApprovalAudit = "approval-audit";
+    public const string Compliance = "compliance";
+    public const string Forecast = "forecast";
+    public const string Variance = "variance";
+}
+
+/// <summary>
+/// Report format options.
+/// </summary>
+public static class ReportFormats
+{
+    public const string Json = "json";
+    public const string Csv = "csv";
+    public const string Excel = "excel";
+    public const string Pdf = "pdf";
+}

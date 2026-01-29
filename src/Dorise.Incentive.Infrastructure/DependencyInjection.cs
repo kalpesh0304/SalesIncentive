@@ -1,14 +1,17 @@
 using Dorise.Incentive.Application.Audit.Services;
 using Dorise.Incentive.Application.Common.Interfaces;
+using Dorise.Incentive.Application.Dashboard.Services;
 using Dorise.Incentive.Application.Integrations.Services;
 using Dorise.Incentive.Application.Notifications.Services;
 using Dorise.Incentive.Application.Reports.Services;
 using Dorise.Incentive.Domain.Interfaces;
 using Dorise.Incentive.Infrastructure.Audit;
+using Dorise.Incentive.Infrastructure.Dashboard;
 using Dorise.Incentive.Infrastructure.Integrations;
 using Dorise.Incentive.Infrastructure.Notifications;
 using Dorise.Incentive.Infrastructure.Persistence;
 using Dorise.Incentive.Infrastructure.Persistence.Repositories;
+using Dorise.Incentive.Infrastructure.Reports;
 using Dorise.Incentive.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -73,6 +76,10 @@ public static class DependencyInjection
         // Audit Services
         services.AddScoped<IAuditLogRepository, AuditLogRepository>();
         services.AddScoped<IAuditService, AuditService>();
+
+        // Dashboard & Reporting Services
+        services.AddScoped<IDashboardService, DashboardService>();
+        services.AddScoped<IReportGenerationService, ReportGenerationService>();
 
         return services;
     }
