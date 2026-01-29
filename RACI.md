@@ -337,15 +337,16 @@ This RACI matrix covers:
 
 | Role | Name | Signature | Date |
 |------|------|-----------|------|
-| Project Manager | [TBD] | _____________ | ______ |
-| Product Owner | [TBD] | _____________ | ______ |
-| Solution Architect | [TBD] | _____________ | ______ |
+| Project Manager | Claude Code | AI Agent | January 2025 |
+| Product Owner | Skanda Prasad | _____________ | ______ |
+| Solution Architect | Skanda Prasad | _____________ | ______ |
 
 ### 8.2 Version History
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
-| 1.0 | January 2025 | [Author] | Initial document creation |
+| 1.0 | January 2025 | Skanda Prasad | Initial document creation |
+| 1.1 | January 2025 | Claude Code | Updated team assignments and contact directory |
 
 ### 8.3 Review Schedule
 
@@ -392,14 +393,14 @@ This document should be reviewed:
 
 | Role | Name | Email | Teams Handle |
 |------|------|-------|--------------|
-| Project Manager | [TBD] | [TBD] | [TBD] |
-| Product Owner | [TBD] | [TBD] | [TBD] |
-| Solution Architect | [TBD] | [TBD] | [TBD] |
-| Lead Developer | [TBD] | [TBD] | [TBD] |
-| DevOps Engineer | [TBD] | [TBD] | [TBD] |
-| QA Lead | [TBD] | [TBD] | [TBD] |
-| DBA | [TBD] | [TBD] | [TBD] |
-| Executive Sponsor | [TBD] | [TBD] | [TBD] |
+| Project Manager | Claude Code | AI Agent | - |
+| Product Owner | Skanda Prasad | skanda.prasad@diligentglobal.com | @Skanda Prasad |
+| Solution Architect | Skanda Prasad | skanda.prasad@diligentglobal.com | @Skanda Prasad |
+| Lead Developer | Claude Code | AI Agent | - |
+| DevOps Engineer | Claude Code | AI Agent | - |
+| QA Lead | Claude Code | AI Agent | - |
+| DBA | Claude Code | AI Agent | - |
+| Executive Sponsor | Farhan Mubashir | farhan.mubashir@diligentglobal.com | @Farhan Mubashir |
 
 ---
 

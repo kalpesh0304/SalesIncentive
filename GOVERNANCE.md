@@ -64,7 +64,7 @@ This governance framework applies to:
 | **Project Type** | Cloud-Native Application Development |
 | **Platform** | Microsoft Azure |
 | **Start Date** | January 2025 |
-| **Target Go-Live** | [TBD] |
+| **Target Go-Live** | August 2025 |
 
 ### 2.2 Business Objectives
 
@@ -97,14 +97,14 @@ This governance framework applies to:
 
 | Role | Responsibility | Named Individual | Contact |
 |------|----------------|------------------|---------|
-| **Project Sponsor** | Budget approval, executive decisions | [TBD] | [TBD] |
-| **Product Owner** | Requirements, UAT sign-off, priority decisions | [TBD] | [TBD] |
-| **Solution Architect** | Azure architecture, technical design, security | [TBD] | [TBD] |
-| **Lead Developer** | Code implementation, code reviews, standards | [TBD] | [TBD] |
-| **DevOps Engineer** | CI/CD pipelines, infrastructure deployment | [TBD] | [TBD] |
-| **QA Lead** | Test planning, quality assurance | [TBD] | [TBD] |
-| **DBA** | Database design, performance optimization | [TBD] | [TBD] |
-| **Business Analyst** | Requirements gathering, documentation | [TBD] | [TBD] |
+| **Project Sponsor** | Budget approval, executive decisions | Farhan Mubashir | farhan.mubashir@diligentglobal.com |
+| **Product Owner** | Requirements, UAT sign-off, priority decisions | Skanda Prasad | skanda.prasad@diligentglobal.com |
+| **Solution Architect** | Azure architecture, technical design, security | Skanda Prasad | skanda.prasad@diligentglobal.com |
+| **Lead Developer** | Code implementation, code reviews, standards | Claude Code | AI Agent |
+| **DevOps Engineer** | CI/CD pipelines, infrastructure deployment | Claude Code | AI Agent |
+| **QA Lead** | Test planning, quality assurance | Claude Code | AI Agent |
+| **DBA** | Database design, performance optimization | Claude Code | AI Agent |
+| **Business Analyst** | Requirements gathering, documentation | Skanda Prasad | skanda.prasad@diligentglobal.com |
 
 ### 3.2 Extended Team
 
@@ -593,11 +593,11 @@ Examples:
 
 | Role | Name | Email | Phone |
 |------|------|-------|-------|
-| Project Sponsor | [TBD] | [TBD] | [TBD] |
-| Product Owner | [TBD] | [TBD] | [TBD] |
-| Solution Architect | [TBD] | [TBD] | [TBD] |
-| Lead Developer | [TBD] | [TBD] | [TBD] |
-| DevOps Engineer | [TBD] | [TBD] | [TBD] |
+| Project Sponsor | Farhan Mubashir | farhan.mubashir@diligentglobal.com | - |
+| Product Owner | Skanda Prasad | skanda.prasad@diligentglobal.com | - |
+| Solution Architect | Skanda Prasad | skanda.prasad@diligentglobal.com | - |
+| Lead Developer | Claude Code | AI Agent | - |
+| DevOps Engineer | Claude Code | AI Agent | - |
 
 ---
 
@@ -605,7 +605,8 @@ Examples:
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
-| 1.0 | January 2025 | [Author] | Initial version |
+| 1.0 | January 2025 | Skanda Prasad | Initial version |
+| 1.1 | January 2025 | Claude Code | Updated team assignments and contact information |
 
 ---
 
