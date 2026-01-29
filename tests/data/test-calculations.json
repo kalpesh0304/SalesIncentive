@@ -1,0 +1,752 @@
+{
+  "_comment": "DSIF Calculation Test Scenarios - Sample calculations for testing",
+  "_ralphQuote": "Me fail English? That's unpossible! - Ralph Wiggum. Our calculations never fail - they're mathematically precise!",
+  "_version": "1.0",
+  "_lastUpdated": "2025-01",
+  "_totalScenarios": 30,
+
+  "calculationScenarios": [
+    {
+      "id": "CALC-SCENARIO-001",
+      "name": "Standard Achievement - Single Slab",
+      "description": "Employee achieves 90% (within 80-100% slab)",
+      "input": {
+        "employeeId": "EMP-001",
+        "planId": "PLAN-001",
+        "periodStart": "2024-04-01",
+        "periodEnd": "2024-04-30",
+        "targetAmount": 100000,
+        "achievements": [
+          { "metricId": "METRIC-001", "actualValue": 90000, "achievementPercent": 90 }
+        ]
+      },
+      "expected": {
+        "grossIncentive": 5000,
+        "netIncentive": 5000,
+        "slabsApplied": [
+          { "slabId": "SLAB-001-2", "fromPercent": 80, "toPercent": 90, "rate": 5, "contribution": 5000 }
+        ],
+        "status": "Calculated"
+      },
+      "_testPurpose": "Basic single slab calculation"
+    },
+    {
+      "id": "CALC-SCENARIO-002",
+      "name": "Below Threshold",
+      "description": "Employee achieves 70% (below 80% threshold)",
+      "input": {
+        "employeeId": "EMP-001",
+        "planId": "PLAN-001",
+        "periodStart": "2024-04-01",
+        "periodEnd": "2024-04-30",
+        "targetAmount": 100000,
+        "achievements": [
+          { "metricId": "METRIC-001", "actualValue": 70000, "achievementPercent": 70 }
+        ]
+      },
+      "expected": {
+        "grossIncentive": 0,
+        "netIncentive": 0,
+        "slabsApplied": [
+          { "slabId": "SLAB-001-1", "fromPercent": 0, "toPercent": 70, "rate": 0, "contribution": 0 }
+        ],
+        "status": "BelowThreshold"
+      },
+      "_testPurpose": "Verify zero incentive below threshold"
+    },
+    {
+      "id": "CALC-SCENARIO-003",
+      "name": "Multiple Slabs - Above Target",
+      "description": "Employee achieves 115% (spans multiple slabs)",
+      "input": {
+        "employeeId": "EMP-002",
+        "planId": "PLAN-001",
+        "periodStart": "2024-04-01",
+        "periodEnd": "2024-04-30",
+        "targetAmount": 150000,
+        "achievements": [
+          { "metricId": "METRIC-001", "actualValue": 172500, "achievementPercent": 115 }
+        ]
+      },
+      "expected": {
+        "grossIncentive": 22500,
+        "netIncentive": 22500,
+        "slabsApplied": [
+          { "slabId": "SLAB-001-2", "fromPercent": 80, "toPercent": 100, "rate": 5, "contribution": 15000 },
+          { "slabId": "SLAB-001-3", "fromPercent": 100, "toPercent": 115, "rate": 8, "contribution": 7500 }
+        ],
+        "status": "Calculated"
+      },
+      "_testPurpose": "Verify multi-slab calculation"
+    },
+    {
+      "id": "CALC-SCENARIO-004",
+      "name": "Super Achiever - Top Slab",
+      "description": "Employee achieves 135% (top slab)",
+      "input": {
+        "employeeId": "EMP-008",
+        "planId": "PLAN-001",
+        "periodStart": "2024-04-01",
+        "periodEnd": "2024-04-30",
+        "targetAmount": 180000,
+        "achievements": [
+          { "metricId": "METRIC-001", "actualValue": 243000, "achievementPercent": 135 }
+        ]
+      },
+      "expected": {
+        "grossIncentive": 50000,
+        "netIncentive": 50000,
+        "slabsApplied": [
+          { "slabId": "SLAB-001-2", "fromPercent": 80, "toPercent": 100, "rate": 5, "contribution": 18000 },
+          { "slabId": "SLAB-001-3", "fromPercent": 100, "toPercent": 120, "rate": 8, "contribution": 14400 },
+          { "slabId": "SLAB-001-4", "fromPercent": 120, "toPercent": 135, "rate": 12, "contribution": 17600 }
+        ],
+        "cappedAmount": 50000,
+        "status": "Capped"
+      },
+      "_testPurpose": "Verify maximum cap is applied"
+    },
+    {
+      "id": "CALC-SCENARIO-005",
+      "name": "Exact Threshold",
+      "description": "Employee achieves exactly 80% (threshold boundary)",
+      "input": {
+        "employeeId": "EMP-004",
+        "planId": "PLAN-001",
+        "periodStart": "2024-04-01",
+        "periodEnd": "2024-04-30",
+        "targetAmount": 120000,
+        "achievements": [
+          { "metricId": "METRIC-001", "actualValue": 96000, "achievementPercent": 80 }
+        ]
+      },
+      "expected": {
+        "grossIncentive": 0,
+        "netIncentive": 0,
+        "slabsApplied": [
+          { "slabId": "SLAB-001-2", "fromPercent": 80, "toPercent": 80, "rate": 5, "contribution": 0 }
+        ],
+        "status": "Calculated"
+      },
+      "_testPurpose": "Verify boundary condition at threshold"
+    },
+    {
+      "id": "CALC-SCENARIO-006",
+      "name": "Exact Target Achievement",
+      "description": "Employee achieves exactly 100%",
+      "input": {
+        "employeeId": "EMP-001",
+        "planId": "PLAN-001",
+        "periodStart": "2024-04-01",
+        "periodEnd": "2024-04-30",
+        "targetAmount": 100000,
+        "achievements": [
+          { "metricId": "METRIC-001", "actualValue": 100000, "achievementPercent": 100 }
+        ]
+      },
+      "expected": {
+        "grossIncentive": 10000,
+        "netIncentive": 10000,
+        "slabsApplied": [
+          { "slabId": "SLAB-001-2", "fromPercent": 80, "toPercent": 100, "rate": 5, "contribution": 10000 }
+        ],
+        "status": "Calculated"
+      },
+      "_testPurpose": "Verify calculation at exactly 100%"
+    },
+    {
+      "id": "CALC-SCENARIO-007",
+      "name": "Zero Achievement",
+      "description": "Employee has zero sales",
+      "input": {
+        "employeeId": "EMP-019",
+        "planId": "PLAN-001",
+        "periodStart": "2024-04-01",
+        "periodEnd": "2024-04-30",
+        "targetAmount": 110000,
+        "achievements": [
+          { "metricId": "METRIC-001", "actualValue": 0, "achievementPercent": 0 }
+        ]
+      },
+      "expected": {
+        "grossIncentive": 0,
+        "netIncentive": 0,
+        "slabsApplied": [],
+        "status": "ZeroAchievement"
+      },
+      "_testPurpose": "Verify zero achievement handling"
+    },
+    {
+      "id": "CALC-SCENARIO-008",
+      "name": "Prorated New Joiner - Mid Month",
+      "description": "Employee joined Jan 15, proration for 17/31 days",
+      "input": {
+        "employeeId": "EMP-003",
+        "planId": "PLAN-002",
+        "periodStart": "2024-01-01",
+        "periodEnd": "2024-01-31",
+        "targetAmount": 200000,
+        "joinDate": "2024-01-15",
+        "achievements": [
+          { "metricId": "METRIC-001", "actualValue": 200000, "achievementPercent": 100 }
+        ],
+        "prorationDays": 17,
+        "totalDays": 31
+      },
+      "expected": {
+        "grossIncentive": 13548,
+        "proratedIncentive": 7429,
+        "netIncentive": 7429,
+        "prorationFactor": 0.548,
+        "status": "Prorated"
+      },
+      "_testPurpose": "Verify proration for mid-month joiner"
+    },
+    {
+      "id": "CALC-SCENARIO-009",
+      "name": "Prorated Leaver - Mid Month",
+      "description": "Employee leaving Jan 20, proration for 20/31 days",
+      "input": {
+        "employeeId": "EMP-005",
+        "planId": "PLAN-001",
+        "periodStart": "2024-06-01",
+        "periodEnd": "2024-06-30",
+        "targetAmount": 100000,
+        "terminationDate": "2024-06-15",
+        "achievements": [
+          { "metricId": "METRIC-001", "actualValue": 95000, "achievementPercent": 95 }
+        ],
+        "prorationDays": 15,
+        "totalDays": 30
+      },
+      "expected": {
+        "grossIncentive": 7500,
+        "proratedIncentive": 3750,
+        "netIncentive": 3750,
+        "prorationFactor": 0.5,
+        "status": "FinalSettlement"
+      },
+      "_testPurpose": "Verify proration for mid-month leaver"
+    },
+    {
+      "id": "CALC-SCENARIO-010",
+      "name": "Multiple Metrics - Weighted Average",
+      "description": "Employee with 70% revenue weight, 30% customer weight",
+      "input": {
+        "employeeId": "EMP-003",
+        "planId": "PLAN-002",
+        "periodStart": "2024-04-01",
+        "periodEnd": "2024-04-30",
+        "targetAmount": 200000,
+        "achievements": [
+          { "metricId": "METRIC-001", "actualValue": 200000, "achievementPercent": 100, "weight": 70 },
+          { "metricId": "METRIC-002", "actualValue": 12, "achievementPercent": 120, "weight": 30 }
+        ]
+      },
+      "expected": {
+        "weightedAchievement": 106,
+        "grossIncentive": 12600,
+        "netIncentive": 12600,
+        "metricBreakdown": [
+          { "metricId": "METRIC-001", "contribution": 70 },
+          { "metricId": "METRIC-002", "contribution": 36 }
+        ],
+        "status": "Calculated"
+      },
+      "_testPurpose": "Verify weighted multi-metric calculation"
+    },
+    {
+      "id": "CALC-SCENARIO-011",
+      "name": "Three Metrics - Balanced Plan",
+      "description": "50% revenue, 25% customers, 25% margin",
+      "input": {
+        "employeeId": "EMP-014",
+        "planId": "PLAN-008",
+        "periodStart": "2024-04-01",
+        "periodEnd": "2024-04-30",
+        "targetAmount": 250000,
+        "achievements": [
+          { "metricId": "METRIC-001", "actualValue": 275000, "achievementPercent": 110, "weight": 50 },
+          { "metricId": "METRIC-002", "actualValue": 8, "achievementPercent": 80, "weight": 25 },
+          { "metricId": "METRIC-004", "actualValue": 35, "achievementPercent": 100, "weight": 25 }
+        ]
+      },
+      "expected": {
+        "weightedAchievement": 100,
+        "grossIncentive": 25000,
+        "netIncentive": 25000,
+        "status": "Calculated"
+      },
+      "_testPurpose": "Verify three-metric weighted calculation"
+    },
+    {
+      "id": "CALC-SCENARIO-012",
+      "name": "High Threshold Plan - Below",
+      "description": "94% achievement with 95% threshold",
+      "input": {
+        "employeeId": "EMP-015",
+        "planId": "PLAN-009",
+        "periodStart": "2024-04-01",
+        "periodEnd": "2024-04-30",
+        "targetAmount": 175000,
+        "achievements": [
+          { "metricId": "METRIC-001", "actualValue": 164500, "achievementPercent": 94 }
+        ]
+      },
+      "expected": {
+        "grossIncentive": 0,
+        "netIncentive": 0,
+        "status": "BelowThreshold"
+      },
+      "_testPurpose": "Verify high threshold boundary"
+    },
+    {
+      "id": "CALC-SCENARIO-013",
+      "name": "High Threshold Plan - Just Above",
+      "description": "96% achievement with 95% threshold",
+      "input": {
+        "employeeId": "EMP-015",
+        "planId": "PLAN-009",
+        "periodStart": "2024-04-01",
+        "periodEnd": "2024-04-30",
+        "targetAmount": 175000,
+        "achievements": [
+          { "metricId": "METRIC-001", "actualValue": 168000, "achievementPercent": 96 }
+        ]
+      },
+      "expected": {
+        "grossIncentive": 1750,
+        "netIncentive": 1750,
+        "status": "Calculated"
+      },
+      "_testPurpose": "Verify just above high threshold"
+    },
+    {
+      "id": "CALC-SCENARIO-014",
+      "name": "Uncapped Plan - Very High Achievement",
+      "description": "200% achievement without cap",
+      "input": {
+        "employeeId": "EMP-028",
+        "planId": "PLAN-007",
+        "periodStart": "2024-04-01",
+        "periodEnd": "2024-04-30",
+        "targetAmount": 280000,
+        "achievements": [
+          { "metricId": "METRIC-001", "actualValue": 560000, "achievementPercent": 200 }
+        ]
+      },
+      "expected": {
+        "grossIncentive": 93800,
+        "netIncentive": 93800,
+        "slabsApplied": [
+          { "slabId": "SLAB-007-2", "fromPercent": 80, "toPercent": 100, "rate": 6, "contribution": 33600 },
+          { "slabId": "SLAB-007-3", "fromPercent": 100, "toPercent": 200, "rate": 10, "contribution": 60200 }
+        ],
+        "status": "Calculated"
+      },
+      "_testPurpose": "Verify uncapped high achievement"
+    },
+    {
+      "id": "CALC-SCENARIO-015",
+      "name": "Currency Conversion - USD to INR",
+      "description": "USD plan with INR payout",
+      "input": {
+        "employeeId": "EMP-035",
+        "planId": "PLAN-010",
+        "periodStart": "2024-04-01",
+        "periodEnd": "2024-04-30",
+        "targetAmount": 3000,
+        "currency": "USD",
+        "payoutCurrency": "INR",
+        "exchangeRate": 83.50,
+        "achievements": [
+          { "metricId": "METRIC-001", "actualValue": 3000, "achievementPercent": 100 }
+        ]
+      },
+      "expected": {
+        "grossIncentiveUSD": 300,
+        "grossIncentiveINR": 25050,
+        "netIncentive": 25050,
+        "status": "Calculated"
+      },
+      "_testPurpose": "Verify currency conversion"
+    },
+    {
+      "id": "CALC-SCENARIO-016",
+      "name": "Decimal Precision",
+      "description": "Achievement 99.5% testing decimal handling",
+      "input": {
+        "employeeId": "EMP-001",
+        "planId": "PLAN-001",
+        "periodStart": "2024-04-01",
+        "periodEnd": "2024-04-30",
+        "targetAmount": 100000,
+        "achievements": [
+          { "metricId": "METRIC-001", "actualValue": 99500, "achievementPercent": 99.5 }
+        ]
+      },
+      "expected": {
+        "grossIncentive": 9750,
+        "netIncentive": 9750,
+        "status": "Calculated"
+      },
+      "_testPurpose": "Verify decimal precision in calculations"
+    },
+    {
+      "id": "CALC-SCENARIO-017",
+      "name": "Manager Team Achievement Multiplier",
+      "description": "Manager with team achievement multiplier rule",
+      "input": {
+        "employeeId": "EMP-010",
+        "planId": "PLAN-004",
+        "periodStart": "2024-04-01",
+        "periodEnd": "2024-04-30",
+        "targetAmount": 500000,
+        "teamAvgAchievement": 95,
+        "achievements": [
+          { "metricId": "METRIC-001", "actualValue": 550000, "achievementPercent": 110, "weight": 60 },
+          { "metricId": "METRIC-002", "actualValue": 20, "achievementPercent": 100, "weight": 25 },
+          { "metricId": "METRIC-004", "actualValue": 32, "achievementPercent": 107, "weight": 15 }
+        ]
+      },
+      "expected": {
+        "weightedAchievement": 107.05,
+        "baseIncentive": 35250,
+        "multiplier": 1.1,
+        "grossIncentive": 38775,
+        "netIncentive": 38775,
+        "status": "Calculated"
+      },
+      "_testPurpose": "Verify team achievement multiplier"
+    },
+    {
+      "id": "CALC-SCENARIO-018",
+      "name": "Enterprise Plan - High Achievement",
+      "description": "Enterprise sales with 5 slabs",
+      "input": {
+        "employeeId": "EMP-022",
+        "planId": "PLAN-002",
+        "periodStart": "2024-04-01",
+        "periodEnd": "2024-04-30",
+        "targetAmount": 220000,
+        "achievements": [
+          { "metricId": "METRIC-001", "actualValue": 330000, "achievementPercent": 150, "weight": 70 },
+          { "metricId": "METRIC-002", "actualValue": 18, "achievementPercent": 180, "weight": 30 }
+        ]
+      },
+      "expected": {
+        "weightedAchievement": 159,
+        "grossIncentive": 100000,
+        "netIncentive": 100000,
+        "status": "Capped"
+      },
+      "_testPurpose": "Verify enterprise plan with high achievement and cap"
+    },
+    {
+      "id": "CALC-SCENARIO-019",
+      "name": "Pre-Sales Bonus Plan",
+      "description": "Pre-sales with deal count metric",
+      "input": {
+        "employeeId": "EMP-006",
+        "planId": "PLAN-003",
+        "periodStart": "2024-04-01",
+        "periodEnd": "2024-06-30",
+        "targetAmount": 80000,
+        "achievements": [
+          { "metricId": "METRIC-003", "actualValue": 12, "achievementPercent": 100 }
+        ]
+      },
+      "expected": {
+        "grossIncentive": 4000,
+        "netIncentive": 4000,
+        "status": "Calculated"
+      },
+      "_testPurpose": "Verify pre-sales bonus calculation"
+    },
+    {
+      "id": "CALC-SCENARIO-020",
+      "name": "Ineligible - Tenure Less Than Required",
+      "description": "New joiner with less than minimum tenure",
+      "input": {
+        "employeeId": "EMP-007",
+        "planId": "PLAN-001",
+        "periodStart": "2024-04-01",
+        "periodEnd": "2024-04-30",
+        "targetAmount": 100000,
+        "tenureMonths": 1,
+        "minimumTenureRequired": 3,
+        "achievements": [
+          { "metricId": "METRIC-001", "actualValue": 120000, "achievementPercent": 120 }
+        ]
+      },
+      "expected": {
+        "grossIncentive": 0,
+        "netIncentive": 0,
+        "status": "IneligibleTenure",
+        "message": "Employee does not meet minimum tenure requirement of 3 months"
+      },
+      "_testPurpose": "Verify tenure eligibility check"
+    },
+    {
+      "id": "CALC-SCENARIO-021",
+      "name": "Negative Adjustment",
+      "description": "Adjustment for returned orders",
+      "input": {
+        "employeeId": "EMP-001",
+        "planId": "PLAN-001",
+        "periodStart": "2024-04-01",
+        "periodEnd": "2024-04-30",
+        "originalCalculationId": "CALC-001",
+        "originalIncentive": 10000,
+        "adjustmentType": "Negative",
+        "adjustmentReason": "Order return - SO-123",
+        "adjustedAchievements": [
+          { "metricId": "METRIC-001", "originalValue": 100000, "adjustedValue": 95000, "newPercent": 95 }
+        ]
+      },
+      "expected": {
+        "originalIncentive": 10000,
+        "newGrossIncentive": 7500,
+        "adjustmentAmount": -2500,
+        "netIncentive": 7500,
+        "status": "Adjusted"
+      },
+      "_testPurpose": "Verify negative adjustment calculation"
+    },
+    {
+      "id": "CALC-SCENARIO-022",
+      "name": "Positive Adjustment",
+      "description": "Adjustment for late order recognition",
+      "input": {
+        "employeeId": "EMP-002",
+        "planId": "PLAN-001",
+        "periodStart": "2024-04-01",
+        "periodEnd": "2024-04-30",
+        "originalCalculationId": "CALC-002",
+        "originalIncentive": 15000,
+        "adjustmentType": "Positive",
+        "adjustmentReason": "Late order recognition - SO-456",
+        "adjustedAchievements": [
+          { "metricId": "METRIC-001", "originalValue": 150000, "adjustedValue": 165000, "newPercent": 110 }
+        ]
+      },
+      "expected": {
+        "originalIncentive": 15000,
+        "newGrossIncentive": 22500,
+        "adjustmentAmount": 7500,
+        "netIncentive": 22500,
+        "status": "Adjusted"
+      },
+      "_testPurpose": "Verify positive adjustment calculation"
+    },
+    {
+      "id": "CALC-SCENARIO-023",
+      "name": "Retrospective Calculation",
+      "description": "Calculation for past period",
+      "input": {
+        "employeeId": "EMP-004",
+        "planId": "PLAN-006",
+        "periodStart": "2024-01-01",
+        "periodEnd": "2024-03-31",
+        "isRetrospective": true,
+        "targetAmount": 120000,
+        "achievements": [
+          { "metricId": "METRIC-001", "actualValue": 132000, "achievementPercent": 110 }
+        ]
+      },
+      "expected": {
+        "grossIncentive": 18000,
+        "netIncentive": 18000,
+        "status": "RetrospectiveCalculated",
+        "flags": ["RequiresSpecialApproval"]
+      },
+      "_testPurpose": "Verify retrospective calculation handling"
+    },
+    {
+      "id": "CALC-SCENARIO-024",
+      "name": "Boundary - Exactly at Slab Boundary",
+      "description": "Achievement exactly at 100%",
+      "input": {
+        "employeeId": "EMP-013",
+        "planId": "PLAN-001",
+        "periodStart": "2024-04-01",
+        "periodEnd": "2024-04-30",
+        "targetAmount": 100000,
+        "achievements": [
+          { "metricId": "METRIC-001", "actualValue": 100000, "achievementPercent": 100 }
+        ]
+      },
+      "expected": {
+        "grossIncentive": 10000,
+        "netIncentive": 10000,
+        "slabsApplied": [
+          { "slabId": "SLAB-001-2", "fromPercent": 80, "toPercent": 100, "rate": 5, "contribution": 10000 }
+        ],
+        "status": "Calculated"
+      },
+      "_testPurpose": "Verify slab boundary behavior"
+    },
+    {
+      "id": "CALC-SCENARIO-025",
+      "name": "Boundary - Just Above 100%",
+      "description": "Achievement at 100.1%",
+      "input": {
+        "employeeId": "EMP-013",
+        "planId": "PLAN-001",
+        "periodStart": "2024-04-01",
+        "periodEnd": "2024-04-30",
+        "targetAmount": 100000,
+        "achievements": [
+          { "metricId": "METRIC-001", "actualValue": 100100, "achievementPercent": 100.1 }
+        ]
+      },
+      "expected": {
+        "grossIncentive": 10008,
+        "netIncentive": 10008,
+        "slabsApplied": [
+          { "slabId": "SLAB-001-2", "fromPercent": 80, "toPercent": 100, "rate": 5, "contribution": 10000 },
+          { "slabId": "SLAB-001-3", "fromPercent": 100, "toPercent": 100.1, "rate": 8, "contribution": 8 }
+        ],
+        "status": "Calculated"
+      },
+      "_testPurpose": "Verify slab transition at boundary"
+    },
+    {
+      "id": "CALC-SCENARIO-026",
+      "name": "Rounding Test - Half Up",
+      "description": "Verify rounding to 2 decimal places",
+      "input": {
+        "employeeId": "EMP-027",
+        "planId": "PLAN-001",
+        "periodStart": "2024-04-01",
+        "periodEnd": "2024-04-30",
+        "targetAmount": 105000,
+        "achievements": [
+          { "metricId": "METRIC-001", "actualValue": 99225, "achievementPercent": 94.5 }
+        ]
+      },
+      "expected": {
+        "grossIncentive": 7612.50,
+        "netIncentive": 7612.50,
+        "status": "Calculated"
+      },
+      "_testPurpose": "Verify rounding behavior"
+    },
+    {
+      "id": "CALC-SCENARIO-027",
+      "name": "Very Large Numbers",
+      "description": "Test with large target and achievement",
+      "input": {
+        "employeeId": "EMP-030",
+        "planId": "PLAN-004",
+        "periodStart": "2024-04-01",
+        "periodEnd": "2024-04-30",
+        "targetAmount": 2000000,
+        "achievements": [
+          { "metricId": "METRIC-001", "actualValue": 2400000, "achievementPercent": 120, "weight": 60 },
+          { "metricId": "METRIC-002", "actualValue": 50, "achievementPercent": 125, "weight": 25 },
+          { "metricId": "METRIC-004", "actualValue": 40, "achievementPercent": 133, "weight": 15 }
+        ]
+      },
+      "expected": {
+        "weightedAchievement": 123.2,
+        "grossIncentive": 212200,
+        "netIncentive": 212200,
+        "status": "Calculated"
+      },
+      "_testPurpose": "Verify large number handling"
+    },
+    {
+      "id": "CALC-SCENARIO-028",
+      "name": "Voided Calculation",
+      "description": "Test voiding a calculation",
+      "input": {
+        "calculationId": "CALC-VOID-001",
+        "employeeId": "EMP-001",
+        "planId": "PLAN-001",
+        "voidReason": "Incorrect achievement data submitted",
+        "voidedBy": "finance.admin"
+      },
+      "expected": {
+        "previousStatus": "Calculated",
+        "newStatus": "Voided",
+        "includedInReports": false,
+        "auditEntry": true
+      },
+      "_testPurpose": "Verify calculation void functionality"
+    },
+    {
+      "id": "CALC-SCENARIO-029",
+      "name": "Batch Calculation",
+      "description": "Multiple employees in batch",
+      "input": {
+        "planId": "PLAN-001",
+        "periodStart": "2024-04-01",
+        "periodEnd": "2024-04-30",
+        "employeeIds": ["EMP-001", "EMP-002", "EMP-004", "EMP-013", "EMP-015", "EMP-019", "EMP-027", "EMP-031", "EMP-037", "EMP-042"],
+        "batchId": "BATCH-001"
+      },
+      "expected": {
+        "totalEmployees": 10,
+        "successfulCalculations": 10,
+        "failedCalculations": 0,
+        "totalIncentive": 75000,
+        "status": "BatchComplete"
+      },
+      "_testPurpose": "Verify batch calculation processing"
+    },
+    {
+      "id": "CALC-SCENARIO-030",
+      "name": "Employee On Leave",
+      "description": "Employee status is On Leave",
+      "input": {
+        "employeeId": "EMP-009",
+        "planId": "PLAN-001",
+        "periodStart": "2024-04-01",
+        "periodEnd": "2024-04-30",
+        "employeeStatus": "OnLeave",
+        "targetAmount": 100000,
+        "achievements": [
+          { "metricId": "METRIC-001", "actualValue": 50000, "achievementPercent": 50 }
+        ]
+      },
+      "expected": {
+        "grossIncentive": 0,
+        "netIncentive": 0,
+        "status": "EmployeeOnLeave",
+        "message": "Calculation deferred - employee on leave"
+      },
+      "_testPurpose": "Verify on-leave employee handling"
+    }
+  ],
+
+  "approvalScenarios": [
+    {
+      "id": "APPROVAL-001",
+      "calculationId": "CALC-SCENARIO-001",
+      "submittedBy": "EMP-010",
+      "amount": 5000,
+      "expectedLevels": 1,
+      "expectedApprovers": ["EMP-010"],
+      "_testPurpose": "Single level approval under threshold"
+    },
+    {
+      "id": "APPROVAL-002",
+      "calculationId": "CALC-SCENARIO-004",
+      "submittedBy": "EMP-010",
+      "amount": 50000,
+      "expectedLevels": 2,
+      "expectedApprovers": ["EMP-010", "EMP-020"],
+      "_testPurpose": "Two level approval at mid threshold"
+    },
+    {
+      "id": "APPROVAL-003",
+      "calculationId": "CALC-SCENARIO-027",
+      "submittedBy": "EMP-010",
+      "amount": 212200,
+      "expectedLevels": 3,
+      "expectedApprovers": ["EMP-010", "EMP-020", "EMP-030"],
+      "_testPurpose": "Three level approval above high threshold"
+    }
+  ]
+}

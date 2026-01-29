@@ -1,0 +1,665 @@
+{
+  "_comment": "DSIF Incentive Plan Test Fixtures - Sample plans for testing",
+  "_ralphQuote": "I bent my wookiee! - Ralph Wiggum. Our incentive plans won't bend - they're rigorously structured!",
+  "_version": "1.0",
+  "_lastUpdated": "2025-01",
+  "_totalPlans": 10,
+
+  "incentivePlans": [
+    {
+      "id": "PLAN-001",
+      "code": "Q1-SALES-2024",
+      "name": "Q1 2024 Sales Incentive Plan",
+      "description": "Quarterly sales incentive plan for Q1 FY2024",
+      "planType": "Commission",
+      "startDate": "2024-04-01",
+      "endDate": "2024-06-30",
+      "status": "Active",
+      "currency": "INR",
+      "eligibleDepartments": ["DEPT-001", "DEPT-002"],
+      "eligibleDesignations": ["DESIG-001", "DESIG-002"],
+      "minimumTenureMonths": 3,
+      "slabs": [
+        {
+          "id": "SLAB-001-1",
+          "sequence": 1,
+          "minAchievement": 0,
+          "maxAchievement": 80,
+          "rate": 0,
+          "description": "Below threshold - no incentive"
+        },
+        {
+          "id": "SLAB-001-2",
+          "sequence": 2,
+          "minAchievement": 80,
+          "maxAchievement": 100,
+          "rate": 5,
+          "description": "Standard performance"
+        },
+        {
+          "id": "SLAB-001-3",
+          "sequence": 3,
+          "minAchievement": 100,
+          "maxAchievement": 120,
+          "rate": 8,
+          "description": "Above target"
+        },
+        {
+          "id": "SLAB-001-4",
+          "sequence": 4,
+          "minAchievement": 120,
+          "maxAchievement": null,
+          "rate": 12,
+          "description": "Super achiever"
+        }
+      ],
+      "rules": [
+        {
+          "id": "RULE-001-1",
+          "type": "MinimumQualification",
+          "condition": "TenureMonths >= 3",
+          "action": "Qualify"
+        },
+        {
+          "id": "RULE-001-2",
+          "type": "MaximumCap",
+          "condition": "IncentiveAmount > 50000",
+          "action": "Cap",
+          "value": 50000
+        }
+      ],
+      "metrics": [
+        {
+          "metricId": "METRIC-001",
+          "name": "Revenue",
+          "weight": 100
+        }
+      ],
+      "_testPurpose": "Standard quarterly sales plan for most tests"
+    },
+    {
+      "id": "PLAN-002",
+      "code": "Q1-ENTERPRISE-2024",
+      "name": "Q1 2024 Enterprise Sales Plan",
+      "description": "Quarterly incentive for enterprise sales team",
+      "planType": "Commission",
+      "startDate": "2024-04-01",
+      "endDate": "2024-06-30",
+      "status": "Active",
+      "currency": "INR",
+      "eligibleDepartments": ["DEPT-002"],
+      "eligibleDesignations": ["DESIG-001", "DESIG-002", "DESIG-003"],
+      "minimumTenureMonths": 1,
+      "slabs": [
+        {
+          "id": "SLAB-002-1",
+          "sequence": 1,
+          "minAchievement": 0,
+          "maxAchievement": 70,
+          "rate": 0,
+          "description": "Below threshold"
+        },
+        {
+          "id": "SLAB-002-2",
+          "sequence": 2,
+          "minAchievement": 70,
+          "maxAchievement": 90,
+          "rate": 4,
+          "description": "Base performance"
+        },
+        {
+          "id": "SLAB-002-3",
+          "sequence": 3,
+          "minAchievement": 90,
+          "maxAchievement": 100,
+          "rate": 7,
+          "description": "On target"
+        },
+        {
+          "id": "SLAB-002-4",
+          "sequence": 4,
+          "minAchievement": 100,
+          "maxAchievement": 130,
+          "rate": 10,
+          "description": "Above target"
+        },
+        {
+          "id": "SLAB-002-5",
+          "sequence": 5,
+          "minAchievement": 130,
+          "maxAchievement": null,
+          "rate": 15,
+          "description": "Excellence tier"
+        }
+      ],
+      "rules": [
+        {
+          "id": "RULE-002-1",
+          "type": "MinimumQualification",
+          "condition": "TenureMonths >= 1",
+          "action": "Qualify"
+        },
+        {
+          "id": "RULE-002-2",
+          "type": "MaximumCap",
+          "condition": "IncentiveAmount > 100000",
+          "action": "Cap",
+          "value": 100000
+        }
+      ],
+      "metrics": [
+        {
+          "metricId": "METRIC-001",
+          "name": "Revenue",
+          "weight": 70
+        },
+        {
+          "metricId": "METRIC-002",
+          "name": "New Customers",
+          "weight": 30
+        }
+      ],
+      "_testPurpose": "Enterprise plan with multiple metrics and higher caps"
+    },
+    {
+      "id": "PLAN-003",
+      "code": "PRESALES-2024",
+      "name": "Pre-Sales Incentive Plan 2024",
+      "description": "Annual incentive plan for pre-sales team",
+      "planType": "Bonus",
+      "startDate": "2024-04-01",
+      "endDate": "2025-03-31",
+      "status": "Active",
+      "currency": "INR",
+      "eligibleDepartments": ["DEPT-003"],
+      "eligibleDesignations": ["DESIG-006"],
+      "minimumTenureMonths": 6,
+      "slabs": [
+        {
+          "id": "SLAB-003-1",
+          "sequence": 1,
+          "minAchievement": 0,
+          "maxAchievement": 85,
+          "rate": 0,
+          "description": "No bonus"
+        },
+        {
+          "id": "SLAB-003-2",
+          "sequence": 2,
+          "minAchievement": 85,
+          "maxAchievement": 100,
+          "rate": 3,
+          "description": "Standard bonus"
+        },
+        {
+          "id": "SLAB-003-3",
+          "sequence": 3,
+          "minAchievement": 100,
+          "maxAchievement": null,
+          "rate": 5,
+          "description": "Super bonus"
+        }
+      ],
+      "rules": [
+        {
+          "id": "RULE-003-1",
+          "type": "MinimumQualification",
+          "condition": "TenureMonths >= 6",
+          "action": "Qualify"
+        }
+      ],
+      "metrics": [
+        {
+          "metricId": "METRIC-003",
+          "name": "Deals Closed",
+          "weight": 100
+        }
+      ],
+      "_testPurpose": "Annual plan for pre-sales with longer tenure requirement"
+    },
+    {
+      "id": "PLAN-004",
+      "code": "MANAGER-Q1-2024",
+      "name": "Q1 2024 Manager Incentive Plan",
+      "description": "Manager-level quarterly incentive",
+      "planType": "Commission",
+      "startDate": "2024-04-01",
+      "endDate": "2024-06-30",
+      "status": "Active",
+      "currency": "INR",
+      "eligibleDepartments": ["DEPT-001", "DEPT-002", "DEPT-003"],
+      "eligibleDesignations": ["DESIG-003", "DESIG-004"],
+      "minimumTenureMonths": 12,
+      "slabs": [
+        {
+          "id": "SLAB-004-1",
+          "sequence": 1,
+          "minAchievement": 0,
+          "maxAchievement": 90,
+          "rate": 0,
+          "description": "Below threshold"
+        },
+        {
+          "id": "SLAB-004-2",
+          "sequence": 2,
+          "minAchievement": 90,
+          "maxAchievement": 100,
+          "rate": 3,
+          "description": "Near target"
+        },
+        {
+          "id": "SLAB-004-3",
+          "sequence": 3,
+          "minAchievement": 100,
+          "maxAchievement": 110,
+          "rate": 5,
+          "description": "On target"
+        },
+        {
+          "id": "SLAB-004-4",
+          "sequence": 4,
+          "minAchievement": 110,
+          "maxAchievement": null,
+          "rate": 8,
+          "description": "Exceeds target"
+        }
+      ],
+      "rules": [
+        {
+          "id": "RULE-004-1",
+          "type": "MinimumQualification",
+          "condition": "TenureMonths >= 12",
+          "action": "Qualify"
+        },
+        {
+          "id": "RULE-004-2",
+          "type": "TeamAchievement",
+          "condition": "TeamAvgAchievement >= 80",
+          "action": "Multiply",
+          "value": 1.1
+        }
+      ],
+      "metrics": [
+        {
+          "metricId": "METRIC-001",
+          "name": "Team Revenue",
+          "weight": 60
+        },
+        {
+          "metricId": "METRIC-002",
+          "name": "New Customers",
+          "weight": 25
+        },
+        {
+          "metricId": "METRIC-004",
+          "name": "Gross Margin",
+          "weight": 15
+        }
+      ],
+      "_testPurpose": "Manager plan with team achievement multiplier"
+    },
+    {
+      "id": "PLAN-005",
+      "code": "DRAFT-TEST-PLAN",
+      "name": "Test Draft Plan",
+      "description": "Draft plan for testing activation flow",
+      "planType": "Commission",
+      "startDate": "2024-07-01",
+      "endDate": "2024-09-30",
+      "status": "Draft",
+      "currency": "INR",
+      "eligibleDepartments": ["DEPT-001"],
+      "eligibleDesignations": ["DESIG-001"],
+      "minimumTenureMonths": 3,
+      "slabs": [
+        {
+          "id": "SLAB-005-1",
+          "sequence": 1,
+          "minAchievement": 0,
+          "maxAchievement": 80,
+          "rate": 0,
+          "description": "No payout"
+        },
+        {
+          "id": "SLAB-005-2",
+          "sequence": 2,
+          "minAchievement": 80,
+          "maxAchievement": null,
+          "rate": 6,
+          "description": "Standard"
+        }
+      ],
+      "rules": [],
+      "metrics": [
+        {
+          "metricId": "METRIC-001",
+          "name": "Revenue",
+          "weight": 100
+        }
+      ],
+      "_testPurpose": "Draft plan for testing plan activation"
+    },
+    {
+      "id": "PLAN-006",
+      "code": "EXPIRED-2023",
+      "name": "Q4 2023 Sales Plan (Expired)",
+      "description": "Expired plan for historical testing",
+      "planType": "Commission",
+      "startDate": "2024-01-01",
+      "endDate": "2024-03-31",
+      "status": "Expired",
+      "currency": "INR",
+      "eligibleDepartments": ["DEPT-001", "DEPT-002"],
+      "eligibleDesignations": ["DESIG-001", "DESIG-002"],
+      "minimumTenureMonths": 3,
+      "slabs": [
+        {
+          "id": "SLAB-006-1",
+          "sequence": 1,
+          "minAchievement": 0,
+          "maxAchievement": 75,
+          "rate": 0,
+          "description": "No payout"
+        },
+        {
+          "id": "SLAB-006-2",
+          "sequence": 2,
+          "minAchievement": 75,
+          "maxAchievement": 100,
+          "rate": 5,
+          "description": "Standard"
+        },
+        {
+          "id": "SLAB-006-3",
+          "sequence": 3,
+          "minAchievement": 100,
+          "maxAchievement": null,
+          "rate": 10,
+          "description": "Overachiever"
+        }
+      ],
+      "rules": [],
+      "metrics": [
+        {
+          "metricId": "METRIC-001",
+          "name": "Revenue",
+          "weight": 100
+        }
+      ],
+      "_testPurpose": "Expired plan for historical queries"
+    },
+    {
+      "id": "PLAN-007",
+      "code": "NO-CAP-PLAN",
+      "name": "Uncapped Incentive Plan",
+      "description": "Plan without maximum cap for testing",
+      "planType": "Commission",
+      "startDate": "2024-04-01",
+      "endDate": "2024-06-30",
+      "status": "Active",
+      "currency": "INR",
+      "eligibleDepartments": ["DEPT-002"],
+      "eligibleDesignations": ["DESIG-002"],
+      "minimumTenureMonths": 6,
+      "slabs": [
+        {
+          "id": "SLAB-007-1",
+          "sequence": 1,
+          "minAchievement": 0,
+          "maxAchievement": 80,
+          "rate": 0,
+          "description": "No payout"
+        },
+        {
+          "id": "SLAB-007-2",
+          "sequence": 2,
+          "minAchievement": 80,
+          "maxAchievement": 100,
+          "rate": 6,
+          "description": "Standard"
+        },
+        {
+          "id": "SLAB-007-3",
+          "sequence": 3,
+          "minAchievement": 100,
+          "maxAchievement": null,
+          "rate": 10,
+          "description": "Unlimited"
+        }
+      ],
+      "rules": [],
+      "metrics": [
+        {
+          "metricId": "METRIC-001",
+          "name": "Revenue",
+          "weight": 100
+        }
+      ],
+      "_testPurpose": "Plan without cap for testing unlimited scenarios"
+    },
+    {
+      "id": "PLAN-008",
+      "code": "MULTI-METRIC-PLAN",
+      "name": "Multi-Metric Balanced Plan",
+      "description": "Plan with multiple weighted metrics",
+      "planType": "Commission",
+      "startDate": "2024-04-01",
+      "endDate": "2024-06-30",
+      "status": "Active",
+      "currency": "INR",
+      "eligibleDepartments": ["DEPT-001", "DEPT-002"],
+      "eligibleDesignations": ["DESIG-001", "DESIG-002"],
+      "minimumTenureMonths": 3,
+      "slabs": [
+        {
+          "id": "SLAB-008-1",
+          "sequence": 1,
+          "minAchievement": 0,
+          "maxAchievement": 80,
+          "rate": 0,
+          "description": "No payout"
+        },
+        {
+          "id": "SLAB-008-2",
+          "sequence": 2,
+          "minAchievement": 80,
+          "maxAchievement": 100,
+          "rate": 5,
+          "description": "Standard"
+        },
+        {
+          "id": "SLAB-008-3",
+          "sequence": 3,
+          "minAchievement": 100,
+          "maxAchievement": null,
+          "rate": 8,
+          "description": "High performer"
+        }
+      ],
+      "rules": [],
+      "metrics": [
+        {
+          "metricId": "METRIC-001",
+          "name": "Revenue",
+          "weight": 50
+        },
+        {
+          "metricId": "METRIC-002",
+          "name": "New Customers",
+          "weight": 25
+        },
+        {
+          "metricId": "METRIC-004",
+          "name": "Gross Margin",
+          "weight": 25
+        }
+      ],
+      "_testPurpose": "Plan with three weighted metrics"
+    },
+    {
+      "id": "PLAN-009",
+      "code": "HIGH-THRESHOLD-PLAN",
+      "name": "High Threshold Plan",
+      "description": "Plan with high minimum threshold",
+      "planType": "Commission",
+      "startDate": "2024-04-01",
+      "endDate": "2024-06-30",
+      "status": "Active",
+      "currency": "INR",
+      "eligibleDepartments": ["DEPT-001"],
+      "eligibleDesignations": ["DESIG-002"],
+      "minimumTenureMonths": 12,
+      "slabs": [
+        {
+          "id": "SLAB-009-1",
+          "sequence": 1,
+          "minAchievement": 0,
+          "maxAchievement": 95,
+          "rate": 0,
+          "description": "No payout"
+        },
+        {
+          "id": "SLAB-009-2",
+          "sequence": 2,
+          "minAchievement": 95,
+          "maxAchievement": 100,
+          "rate": 10,
+          "description": "Qualified"
+        },
+        {
+          "id": "SLAB-009-3",
+          "sequence": 3,
+          "minAchievement": 100,
+          "maxAchievement": null,
+          "rate": 15,
+          "description": "Super achiever"
+        }
+      ],
+      "rules": [],
+      "metrics": [
+        {
+          "metricId": "METRIC-001",
+          "name": "Revenue",
+          "weight": 100
+        }
+      ],
+      "_testPurpose": "Plan with 95% minimum threshold"
+    },
+    {
+      "id": "PLAN-010",
+      "code": "USD-PLAN",
+      "name": "USD-Based Incentive Plan",
+      "description": "Plan with USD currency for testing conversion",
+      "planType": "Commission",
+      "startDate": "2024-04-01",
+      "endDate": "2024-06-30",
+      "status": "Active",
+      "currency": "USD",
+      "eligibleDepartments": ["DEPT-002"],
+      "eligibleDesignations": ["DESIG-002"],
+      "minimumTenureMonths": 6,
+      "slabs": [
+        {
+          "id": "SLAB-010-1",
+          "sequence": 1,
+          "minAchievement": 0,
+          "maxAchievement": 80,
+          "rate": 0,
+          "description": "No payout"
+        },
+        {
+          "id": "SLAB-010-2",
+          "sequence": 2,
+          "minAchievement": 80,
+          "maxAchievement": 100,
+          "rate": 5,
+          "description": "Standard"
+        },
+        {
+          "id": "SLAB-010-3",
+          "sequence": 3,
+          "minAchievement": 100,
+          "maxAchievement": null,
+          "rate": 8,
+          "description": "High performer"
+        }
+      ],
+      "rules": [
+        {
+          "id": "RULE-010-1",
+          "type": "MaximumCap",
+          "condition": "IncentiveAmount > 1000",
+          "action": "Cap",
+          "value": 1000
+        }
+      ],
+      "metrics": [
+        {
+          "metricId": "METRIC-001",
+          "name": "Revenue",
+          "weight": 100
+        }
+      ],
+      "_testPurpose": "USD plan for currency conversion testing"
+    }
+  ],
+
+  "planAssignments": [
+    {
+      "id": "ASSIGN-001",
+      "employeeId": "EMP-001",
+      "planId": "PLAN-001",
+      "effectiveDate": "2024-04-01",
+      "targetAmount": 100000,
+      "status": "Active"
+    },
+    {
+      "id": "ASSIGN-002",
+      "employeeId": "EMP-002",
+      "planId": "PLAN-001",
+      "effectiveDate": "2024-04-01",
+      "targetAmount": 150000,
+      "status": "Active"
+    },
+    {
+      "id": "ASSIGN-003",
+      "employeeId": "EMP-003",
+      "planId": "PLAN-002",
+      "effectiveDate": "2024-04-01",
+      "targetAmount": 200000,
+      "status": "Active"
+    },
+    {
+      "id": "ASSIGN-004",
+      "employeeId": "EMP-008",
+      "planId": "PLAN-002",
+      "effectiveDate": "2024-04-01",
+      "targetAmount": 180000,
+      "status": "Active"
+    },
+    {
+      "id": "ASSIGN-005",
+      "employeeId": "EMP-006",
+      "planId": "PLAN-003",
+      "effectiveDate": "2024-04-01",
+      "targetAmount": 80000,
+      "status": "Active"
+    },
+    {
+      "id": "ASSIGN-006",
+      "employeeId": "EMP-010",
+      "planId": "PLAN-004",
+      "effectiveDate": "2024-04-01",
+      "targetAmount": 500000,
+      "status": "Active"
+    },
+    {
+      "id": "ASSIGN-007",
+      "employeeId": "EMP-011",
+      "planId": "PLAN-004",
+      "effectiveDate": "2024-04-01",
+      "targetAmount": 600000,
+      "status": "Active"
+    }
+  ]
+}
