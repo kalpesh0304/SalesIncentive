@@ -35,6 +35,8 @@ public class Calculation : AuditableEntity, IAggregateRoot
     public string? CalculatedBy { get; private set; }
     public string? RejectionReason { get; private set; }
     public string? AdjustmentReason { get; private set; }
+    public string? VoidedBy { get; private set; }
+    public string? VoidReason { get; private set; }
     public int Version { get; private set; }
     public Guid? PreviousVersionId { get; private set; }
 
@@ -146,12 +148,13 @@ public class Calculation : AuditableEntity, IAggregateRoot
         AddDomainEvent(new CalculationSubmittedForApprovalEvent(Id, EmployeeId));
     }
 
-    public void Approve(string approvedBy)
+    public void Approve(string approvedBy, string? comments = null)
     {
         if (Status != CalculationStatus.PendingApproval)
             throw new InvalidOperationException($"Cannot approve when status is {Status}");
 
         Status = CalculationStatus.Approved;
+        // Comments stored via approval record, not directly on calculation
         AddDomainEvent(new CalculationApprovedEvent(Id, EmployeeId, approvedBy));
     }
 
@@ -174,10 +177,11 @@ public class Calculation : AuditableEntity, IAggregateRoot
         AddDomainEvent(new CalculationPaidEvent(Id, EmployeeId, NetIncentive.Amount));
     }
 
-    public void Void(string voidedBy, string reason)
+    public void Void(string reason, string voidedBy)
     {
         Status = CalculationStatus.Voided;
-        AdjustmentReason = reason;
+        VoidReason = reason;
+        VoidedBy = voidedBy;
         AddDomainEvent(new CalculationVoidedEvent(Id, EmployeeId, voidedBy, reason));
     }
 
@@ -198,6 +202,54 @@ public class Calculation : AuditableEntity, IAggregateRoot
         adjusted.Status = CalculationStatus.Adjusted;
 
         return adjusted;
+    }
+
+    /// <summary>
+    /// Adjusts the net incentive amount directly.
+    /// </summary>
+    public void Adjust(Money newAmount, string reason, string adjustedBy)
+    {
+        var validStatuses = new[]
+        {
+            CalculationStatus.Calculated,
+            CalculationStatus.Approved,
+            CalculationStatus.Prorated,
+            CalculationStatus.Capped
+        };
+
+        if (!validStatuses.Contains(Status))
+            throw new InvalidOperationException($"Cannot adjust calculation in {Status} status");
+
+        NetIncentive = newAmount;
+        AdjustmentReason = reason;
+        CalculatedBy = adjustedBy;
+        Status = CalculationStatus.Adjusted;
+        Version++;
+
+        AddDomainEvent(new CalculationAdjustedEvent(Id, EmployeeId, newAmount.Amount, reason, adjustedBy));
+    }
+
+    /// <summary>
+    /// Recalculates with new values from the calculation service.
+    /// </summary>
+    public void Recalculate(
+        decimal newActualValue,
+        Money grossIncentive,
+        Money netIncentive,
+        Percentage achievement,
+        Guid? appliedSlabId)
+    {
+        ActualValue = newActualValue;
+        AchievementPercentage = achievement;
+        GrossIncentive = grossIncentive;
+        NetIncentive = netIncentive;
+        AppliedSlabId = appliedSlabId;
+        Status = CalculationStatus.Calculated;
+        CalculatedAt = DateTime.UtcNow;
+        Version++;
+        ProrataFactor = null; // Reset proration as it may need to be re-applied
+
+        AddDomainEvent(new CalculationRecalculatedEvent(Id, EmployeeId, netIncentive.Amount));
     }
 
     internal void AddApproval(Approval approval)

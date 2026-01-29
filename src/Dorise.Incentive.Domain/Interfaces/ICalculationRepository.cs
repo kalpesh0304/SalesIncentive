@@ -93,4 +93,54 @@ public interface ICalculationRepository : IAggregateRepository<Calculation>
     Task<IReadOnlyList<Calculation>> GetApprovedForPaymentAsync(
         DateRange period,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets a calculation with full details including approvals.
+    /// </summary>
+    Task<Calculation?> GetWithDetailsAsync(
+        Guid calculationId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets paginated calculations with optional filtering.
+    /// </summary>
+    Task<(IReadOnlyList<Calculation> Items, int TotalCount)> GetPagedAsync(
+        int page,
+        int pageSize,
+        string? period = null,
+        Guid? employeeId = null,
+        Guid? planId = null,
+        CalculationStatus? status = null,
+        string? sortBy = null,
+        bool sortDescending = false,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets calculations for an employee with optional date and status filtering.
+    /// </summary>
+    Task<IReadOnlyList<Calculation>> GetByEmployeeAsync(
+        Guid employeeId,
+        DateTime? periodStart,
+        DateTime? periodEnd,
+        CalculationStatus? status,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets calculations for a period with optional department/plan filtering.
+    /// </summary>
+    Task<IReadOnlyList<Calculation>> GetByPeriodAsync(
+        DateTime periodStart,
+        DateTime periodEnd,
+        Guid? departmentId = null,
+        Guid? planId = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets pending approvals with pagination.
+    /// </summary>
+    Task<(IReadOnlyList<Calculation> Items, int TotalCount)> GetPendingApprovalsAsync(
+        Guid? approverId,
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken = default);
 }

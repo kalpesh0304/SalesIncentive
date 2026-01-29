@@ -105,3 +105,47 @@ public sealed class CalculationVoidedEvent : DomainEvent
         Reason = reason;
     }
 }
+
+/// <summary>
+/// Event raised when a calculation amount is manually adjusted.
+/// "I'm learnding!" - Learning about adjustments!
+/// </summary>
+public sealed class CalculationAdjustedEvent : DomainEvent
+{
+    public Guid CalculationId { get; }
+    public Guid EmployeeId { get; }
+    public decimal NewAmount { get; }
+    public string Reason { get; }
+    public string AdjustedBy { get; }
+
+    public CalculationAdjustedEvent(
+        Guid calculationId,
+        Guid employeeId,
+        decimal newAmount,
+        string reason,
+        string adjustedBy)
+    {
+        CalculationId = calculationId;
+        EmployeeId = employeeId;
+        NewAmount = newAmount;
+        Reason = reason;
+        AdjustedBy = adjustedBy;
+    }
+}
+
+/// <summary>
+/// Event raised when a calculation is recalculated with new values.
+/// </summary>
+public sealed class CalculationRecalculatedEvent : DomainEvent
+{
+    public Guid CalculationId { get; }
+    public Guid EmployeeId { get; }
+    public decimal NewAmount { get; }
+
+    public CalculationRecalculatedEvent(Guid calculationId, Guid employeeId, decimal newAmount)
+    {
+        CalculationId = calculationId;
+        EmployeeId = employeeId;
+        NewAmount = newAmount;
+    }
+}

@@ -1,8 +1,11 @@
+using AutoMapper;
+using Dorise.Incentive.Application.Calculations.DTOs;
 using Dorise.Incentive.Application.Common.Interfaces;
 using Dorise.Incentive.Domain.Entities;
 using Dorise.Incentive.Domain.Interfaces;
 using Dorise.Incentive.Domain.Services;
 using Dorise.Incentive.Domain.ValueObjects;
+using Microsoft.Extensions.Logging;
 
 namespace Dorise.Incentive.Application.Calculations.Commands.RunCalculation;
 
@@ -10,36 +13,63 @@ namespace Dorise.Incentive.Application.Calculations.Commands.RunCalculation;
 /// Handler for RunCalculationCommand.
 /// "My parents won't let me use scissors!" - But we CAN calculate incentives!
 /// </summary>
-public class RunCalculationCommandHandler : ICommandHandler<RunCalculationCommand, Guid>
+public class RunCalculationCommandHandler : ICommandHandler<RunCalculationCommand, CalculationDto>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IIncentiveCalculationService _calculationService;
+    private readonly IEligibilityService _eligibilityService;
+    private readonly IMapper _mapper;
+    private readonly ILogger<RunCalculationCommandHandler> _logger;
 
     public RunCalculationCommandHandler(
         IUnitOfWork unitOfWork,
-        IIncentiveCalculationService calculationService)
+        IIncentiveCalculationService calculationService,
+        IEligibilityService eligibilityService,
+        IMapper mapper,
+        ILogger<RunCalculationCommandHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _calculationService = calculationService;
+        _eligibilityService = eligibilityService;
+        _mapper = mapper;
+        _logger = logger;
     }
 
-    public async Task<Result<Guid>> Handle(RunCalculationCommand request, CancellationToken cancellationToken)
+    public async Task<Result<CalculationDto>> Handle(
+        RunCalculationCommand request,
+        CancellationToken cancellationToken)
     {
         // Validate employee exists
         var employee = await _unitOfWork.Employees.GetByIdAsync(request.EmployeeId, cancellationToken);
         if (employee == null)
         {
-            return Result.NotFound<Guid>("Employee", request.EmployeeId);
+            return Result<CalculationDto>.NotFound("Employee", request.EmployeeId);
         }
 
         // Validate plan exists and is active
         var plan = await _unitOfWork.IncentivePlans.GetWithSlabsAsync(request.IncentivePlanId, cancellationToken);
         if (plan == null)
         {
-            return Result.NotFound<Guid>("IncentivePlan", request.IncentivePlanId);
+            return Result<CalculationDto>.NotFound("IncentivePlan", request.IncentivePlanId);
+        }
+
+        if (!plan.IsActive)
+        {
+            return Result<CalculationDto>.Failure(
+                "Cannot calculate incentive for inactive plan",
+                "PLAN_INACTIVE");
         }
 
         var period = DateRange.Create(request.PeriodStart, request.PeriodEnd);
+
+        // Check eligibility
+        var eligibility = _eligibilityService.CheckEligibility(employee, plan, request.PeriodEnd);
+        if (!eligibility.IsEligible)
+        {
+            return Result<CalculationDto>.Failure(
+                $"Employee is not eligible: {eligibility.Reason}",
+                "NOT_ELIGIBLE");
+        }
 
         // Check if calculation already exists for this period
         var existingCalculation = await _unitOfWork.Calculations.GetLatestAsync(
@@ -48,10 +78,10 @@ public class RunCalculationCommandHandler : ICommandHandler<RunCalculationComman
             period,
             cancellationToken);
 
-        if (existingCalculation != null)
+        if (existingCalculation != null && existingCalculation.IsActive)
         {
-            return Result.Failure<Guid>(
-                "Calculation already exists for this employee, plan, and period. Use adjustment endpoint to modify.",
+            return Result<CalculationDto>.Failure(
+                "Calculation already exists for this employee, plan, and period. Use recalculate endpoint to update.",
                 "DUPLICATE_CALCULATION");
         }
 
@@ -60,7 +90,9 @@ public class RunCalculationCommandHandler : ICommandHandler<RunCalculationComman
 
         if (!result.Success)
         {
-            return Result.Failure<Guid>(result.Message ?? "Calculation failed", "CALCULATION_FAILED");
+            return Result<CalculationDto>.Failure(
+                result.Message ?? "Calculation failed",
+                "CALCULATION_FAILED");
         }
 
         // Create calculation entity
@@ -73,19 +105,20 @@ public class RunCalculationCommandHandler : ICommandHandler<RunCalculationComman
             employee.BaseSalary);
 
         // Apply calculation results
-        calculation.Calculate(result.GrossIncentive, result.AppliedSlab?.Id);
+        calculation.SetCalculationResult(
+            result.GrossIncentive,
+            result.NetIncentive,
+            result.Achievement,
+            result.AppliedSlab?.Id);
 
         // Apply prorata if needed
-        if (result.NetIncentive.Amount != result.GrossIncentive.Amount)
+        if (eligibility.ProrataFactor.Value < 100)
         {
-            var prorataPercentage = result.GrossIncentive.Amount > 0
-                ? result.NetIncentive.Amount / result.GrossIncentive.Amount * 100
-                : 0;
-            calculation.ApplyProrata(Percentage.Create(prorataPercentage));
+            calculation.ApplyProrata(eligibility.ProrataFactor);
         }
 
-        // Apply cap if configured
-        if (plan.MaximumPayout != null)
+        // Apply cap if configured and exceeded
+        if (plan.MaximumPayout != null && calculation.NetIncentive > plan.MaximumPayout)
         {
             calculation.ApplyCap(plan.MaximumPayout);
         }
@@ -96,9 +129,25 @@ public class RunCalculationCommandHandler : ICommandHandler<RunCalculationComman
             calculation.MarkBelowThreshold();
         }
 
+        // Set notes if provided
+        if (!string.IsNullOrEmpty(request.Notes))
+        {
+            calculation.SetNotes(request.Notes);
+        }
+
         await _unitOfWork.Calculations.AddAsync(calculation, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return Result.Success(calculation.Id);
+        _logger.LogInformation(
+            "Created calculation {CalculationId} for employee {EmployeeId}. " +
+            "Achievement: {Achievement}%, Gross: {Gross}, Net: {Net}",
+            calculation.Id, employee.Id,
+            result.Achievement.Value,
+            result.GrossIncentive.Amount,
+            result.NetIncentive.Amount);
+
+        // Reload with related data for full DTO mapping
+        var createdCalc = await _unitOfWork.Calculations.GetWithDetailsAsync(calculation.Id, cancellationToken);
+        return Result<CalculationDto>.Success(_mapper.Map<CalculationDto>(createdCalc));
     }
 }
