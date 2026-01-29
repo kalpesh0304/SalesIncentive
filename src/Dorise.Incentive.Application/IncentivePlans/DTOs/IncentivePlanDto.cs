@@ -3,8 +3,8 @@ using Dorise.Incentive.Domain.Enums;
 namespace Dorise.Incentive.Application.IncentivePlans.DTOs;
 
 /// <summary>
-/// Data transfer object for IncentivePlan.
-/// "I'm pedaling backwards!" - But plans move forward!
+/// Full DTO for Incentive Plan.
+/// "That's where I saw the leprechaun!" - And this is where we see the plan details!
 /// </summary>
 public record IncentivePlanDto
 {
@@ -18,28 +18,39 @@ public record IncentivePlanDto
     public string StatusDisplay { get; init; } = null!;
     public PaymentFrequency Frequency { get; init; }
     public string FrequencyDisplay { get; init; } = null!;
+
+    // Effective Period
     public DateTime EffectiveFrom { get; init; }
     public DateTime EffectiveTo { get; init; }
+    public bool IsCurrentlyEffective { get; init; }
 
-    // Target
+    // Target Configuration
     public decimal TargetValue { get; init; }
     public decimal MinimumThreshold { get; init; }
     public AchievementType AchievementType { get; init; }
     public string? MetricUnit { get; init; }
 
-    // Limits
+    // Payout Configuration
     public decimal? MaximumPayout { get; init; }
     public decimal? MinimumPayout { get; init; }
     public string Currency { get; init; } = "INR";
 
-    // Approval
+    // Approval Settings
     public bool RequiresApproval { get; init; }
     public int ApprovalLevels { get; init; }
 
+    // Eligibility
+    public int? MinimumTenureDays { get; init; }
     public string? EligibilityCriteria { get; init; }
+
+    // Metadata
     public int Version { get; init; }
+    public int SlabCount { get; init; }
+    public int AssignmentCount { get; init; }
     public DateTime CreatedAt { get; init; }
+    public string? CreatedBy { get; init; }
     public DateTime? ModifiedAt { get; init; }
+    public string? ModifiedBy { get; init; }
 
     public IReadOnlyList<SlabDto> Slabs { get; init; } = Array.Empty<SlabDto>();
 }
@@ -57,53 +68,68 @@ public record IncentivePlanSummaryDto
     public PaymentFrequency Frequency { get; init; }
     public DateTime EffectiveFrom { get; init; }
     public DateTime EffectiveTo { get; init; }
-    public int AssignedEmployeesCount { get; init; }
+    public decimal TargetValue { get; init; }
+    public int AssignmentCount { get; init; }
 }
 
 /// <summary>
-/// DTO for slab information.
+/// Plan with all slabs included.
+/// </summary>
+public record IncentivePlanWithSlabsDto : IncentivePlanDto
+{
+    public new IReadOnlyList<SlabDto> Slabs { get; init; } = Array.Empty<SlabDto>();
+}
+
+/// <summary>
+/// DTO for Slab configuration.
 /// </summary>
 public record SlabDto
 {
     public Guid Id { get; init; }
+    public string Name { get; init; } = null!;
+    public string? Description { get; init; }
     public int Order { get; init; }
     public decimal FromPercentage { get; init; }
     public decimal ToPercentage { get; init; }
-    public decimal PayoutRate { get; init; }
-    public string? Description { get; init; }
+    public decimal PayoutPercentage { get; init; }
+    public decimal? FixedAmount { get; init; }
+    public string Currency { get; init; } = "INR";
+    public bool IsActive { get; init; }
 }
 
 /// <summary>
-/// Request DTO for creating a plan.
+/// Result of plan validation.
 /// </summary>
-public record CreateIncentivePlanRequest
+public record PlanValidationResultDto
+{
+    public Guid PlanId { get; init; }
+    public bool IsValid { get; init; }
+    public bool CanBeActivated { get; init; }
+    public IReadOnlyList<ValidationIssueDto> Errors { get; init; } = Array.Empty<ValidationIssueDto>();
+    public IReadOnlyList<ValidationIssueDto> Warnings { get; init; } = Array.Empty<ValidationIssueDto>();
+}
+
+/// <summary>
+/// A single validation issue.
+/// </summary>
+public record ValidationIssueDto
 {
     public string Code { get; init; } = null!;
-    public string Name { get; init; } = null!;
-    public string? Description { get; init; }
-    public PlanType PlanType { get; init; }
-    public PaymentFrequency Frequency { get; init; }
-    public DateTime EffectiveFrom { get; init; }
-    public DateTime EffectiveTo { get; init; }
-    public decimal TargetValue { get; init; }
-    public decimal MinimumThreshold { get; init; }
-    public AchievementType AchievementType { get; init; }
-    public string? MetricUnit { get; init; }
-    public decimal? MaximumPayout { get; init; }
-    public decimal? MinimumPayout { get; init; }
-    public string Currency { get; init; } = "INR";
-    public bool RequiresApproval { get; init; } = true;
-    public int ApprovalLevels { get; init; } = 1;
-    public IReadOnlyList<CreateSlabRequest>? Slabs { get; init; }
+    public string Message { get; init; } = null!;
+    public string? Field { get; init; }
+    public string Severity { get; init; } = null!; // "Error" or "Warning"
 }
 
 /// <summary>
-/// Request DTO for creating a slab.
+/// Paged result wrapper.
 /// </summary>
-public record CreateSlabRequest
+public record PagedResult<T>
 {
-    public decimal FromPercentage { get; init; }
-    public decimal ToPercentage { get; init; }
-    public decimal PayoutRate { get; init; }
-    public string? Description { get; init; }
+    public IReadOnlyList<T> Items { get; init; } = Array.Empty<T>();
+    public int Page { get; init; }
+    public int PageSize { get; init; }
+    public int TotalCount { get; init; }
+    public int TotalPages => (int)Math.Ceiling(TotalCount / (double)PageSize);
+    public bool HasNextPage => Page < TotalPages;
+    public bool HasPreviousPage => Page > 1;
 }
