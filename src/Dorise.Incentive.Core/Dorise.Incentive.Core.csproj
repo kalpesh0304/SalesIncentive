@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Dorise.Incentive.Core</RootNamespace>
+    <AssemblyName>Dorise.Incentive.Core</AssemblyName>
+    <Description>Core library containing domain models, interfaces, and business logic for the Dorise Sales Incentive Framework.</Description>
+    <Authors>Dorise Team</Authors>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+
+</Project>
