@@ -22,6 +22,14 @@ public class DepartmentRepository : AggregateRepositoryBase<Department>, IDepart
             .FirstOrDefaultAsync(d => d.Code == code, cancellationToken);
     }
 
+    public async Task<Department?> GetByNameAsync(
+        string name,
+        CancellationToken cancellationToken = default)
+    {
+        return await DbSet
+            .FirstOrDefaultAsync(d => d.Name == name, cancellationToken);
+    }
+
     public async Task<IReadOnlyList<Department>> GetActiveAsync(
         CancellationToken cancellationToken = default)
     {

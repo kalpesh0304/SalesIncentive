@@ -14,6 +14,11 @@ public interface IDepartmentRepository : IAggregateRepository<Department>
     Task<Department?> GetByCodeAsync(string code, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Gets a department by its name.
+    /// </summary>
+    Task<Department?> GetByNameAsync(string name, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Gets all active departments.
     /// </summary>
     Task<IReadOnlyList<Department>> GetActiveAsync(CancellationToken cancellationToken = default);

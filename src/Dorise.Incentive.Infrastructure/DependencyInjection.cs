@@ -1,6 +1,8 @@
 using Dorise.Incentive.Application.Common.Interfaces;
+using Dorise.Incentive.Application.Integrations.Services;
 using Dorise.Incentive.Application.Reports.Services;
 using Dorise.Incentive.Domain.Interfaces;
+using Dorise.Incentive.Infrastructure.Integrations;
 using Dorise.Incentive.Infrastructure.Persistence;
 using Dorise.Incentive.Infrastructure.Persistence.Repositories;
 using Dorise.Incentive.Infrastructure.Services;
@@ -45,6 +47,11 @@ public static class DependencyInjection
         // Services
         services.AddScoped<IDateTimeService, DateTimeService>();
         services.AddScoped<IExportService, ExportService>();
+
+        // Integration Services
+        services.AddScoped<IErpIntegrationService, ErpIntegrationService>();
+        services.AddScoped<IHrIntegrationService, HrIntegrationService>();
+        services.AddScoped<IPayrollIntegrationService, PayrollIntegrationService>();
 
         return services;
     }
