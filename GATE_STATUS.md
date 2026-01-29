@@ -67,17 +67,16 @@ This document tracks the status of all Quality Gates for the DSIF project. Quali
 |----|-----------|--------|----------|
 | QG0-AC1 | Project scope clearly defined | ✅ Met | README.md, GOVERNANCE.md |
 | QG0-AC2 | Team roles assigned with named individuals | ✅ Met | GOVERNANCE.md Section 3 |
-| QG0-AC3 | Azure subscription confirmed and accessible | ⬜ Pending | Awaiting confirmation from Skanda Prasad |
+| QG0-AC3 | Azure subscription confirmed and accessible | ✅ Met | Subscription confirmed by Skanda Prasad |
 | QG0-AC4 | Repository structure created | ⬜ Pending | Folder structure to be created |
 | QG0-AC5 | Naming conventions documented | ✅ Met | GOVERNANCE.md Section 5 |
 | QG0-AC6 | All required documents created and reviewed | 🟡 In Progress | 5/5 documents created |
 
-### Gate Progress: 75%
+### Gate Progress: 85%
 
 **Remaining Actions:**
-1. Confirm Azure subscription access
-2. Create repository folder structure (`/docs`, `/src`, `/tests`, `/infra`)
-3. Formal gate review and sign-off
+1. Create repository folder structure (`/docs`, `/src`, `/tests`, `/infra`)
+2. Formal gate review and sign-off
 
 ---
 
@@ -246,6 +245,7 @@ This document tracks the status of all Quality Gates for the DSIF project. Quali
 | Date | Gate | Action | Performed By | Notes |
 |------|------|--------|--------------|-------|
 | Jan 2025 | QG-0 | Started | Claude Code | Foundation phase initiated |
+| Jan 2025 | QG-0 | Azure Subscription Confirmed | Skanda Prasad | Subscription access verified |
 
 ---
 
