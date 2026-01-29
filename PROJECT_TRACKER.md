@@ -3,7 +3,7 @@
 
 **Document ID:** DOC-015
 **Project:** Dorise Sales Incentive Framework (DSIF)
-**Version:** 1.1
+**Version:** 1.2
 **Created:** January 2025
 **Last Updated:** January 2025
 **Updated By:** Claude Code
@@ -130,8 +130,8 @@
 
 | Phase | Description | Start | End | Progress | Status |
 |-------|-------------|-------|-----|----------|--------|
-| Phase 0 | Foundation | Jan 2025 | - | 85% | 🟡 In Progress |
-| Phase 1 | Requirements | - | - | 0% | ⬜ Not Started |
+| Phase 0 | Foundation | Jan 2025 | Jan 2025 | 100% | ✅ Complete |
+| Phase 1 | Requirements | Jan 2025 | - | 0% | 🟡 In Progress |
 | Phase 2 | Architecture | - | - | 0% | ⬜ Not Started |
 | Phase 3 | Technical Specs | - | - | 0% | ⬜ Not Started |
 | Phase 4 | Infrastructure | - | - | 0% | ⬜ Not Started |
@@ -149,21 +149,21 @@
 | P0-T05 | Create GATE_STATUS.md | Claude Code | Jan 2025 | ✅ Complete | Gate tracking active |
 | P0-T06 | Initialize Git repository | Claude Code | Jan 2025 | ✅ Complete | Repository active |
 | P0-T07 | Setup Azure subscription | Skanda Prasad | Jan 2025 | ✅ Complete | Subscription confirmed |
-| P0-T08 | Establish folder structure | Claude Code | Jan 2025 | ⬜ Pending | Next task |
-| P0-T09 | QG-0 Gate Review | Claude Code | Jan 2025 | ⬜ Pending | After all tasks complete |
+| P0-T08 | Establish folder structure | Claude Code | Jan 2025 | ✅ Complete | Structure created |
+| P0-T09 | QG-0 Gate Review | Claude Code | Jan 2025 | ✅ Complete | Gate passed |
 
 ### 3.3 Phase 1: Requirements - Task List
 
 | Task ID | Task | Owner | Due Date | Status | Notes |
 |---------|------|-------|----------|--------|-------|
-| P1-T01 | Stakeholder interviews | PO | - | 🔒 Locked | Requires QG-0 |
-| P1-T02 | Document functional requirements | PO | - | 🔒 Locked | Requires QG-0 |
-| P1-T03 | Document NFRs | Architect | - | 🔒 Locked | Requires QG-0 |
-| P1-T04 | Create user stories | PO | - | 🔒 Locked | Requires QG-0 |
-| P1-T05 | Define acceptance criteria | PO/QA | - | 🔒 Locked | Requires QG-0 |
-| P1-T06 | Requirements review | All | - | 🔒 Locked | Requires QG-0 |
-| P1-T07 | Requirements sign-off | PO | - | 🔒 Locked | Requires QG-0 |
-| P1-T08 | QG-1 Gate Review | PO | - | 🔒 Locked | Requires QG-0 |
+| P1-T01 | Stakeholder interviews | Skanda Prasad | Feb 2025 | ⬜ Pending | QG-0 passed |
+| P1-T02 | Document functional requirements | Skanda Prasad | Feb 2025 | ⬜ Pending | QG-0 passed |
+| P1-T03 | Document NFRs | Skanda Prasad | Feb 2025 | ⬜ Pending | QG-0 passed |
+| P1-T04 | Create user stories | Skanda Prasad | Feb 2025 | ⬜ Pending | QG-0 passed |
+| P1-T05 | Define acceptance criteria | Skanda Prasad/Claude Code | Feb 2025 | ⬜ Pending | QG-0 passed |
+| P1-T06 | Requirements review | All | Feb 2025 | ⬜ Pending | QG-0 passed |
+| P1-T07 | Requirements sign-off | Skanda Prasad | Feb 2025 | ⬜ Pending | QG-0 passed |
+| P1-T08 | QG-1 Gate Review | Skanda Prasad | Feb 2025 | ⬜ Pending | QG-0 passed |
 
 ### 3.4 Phase 2: Architecture - Task List
 
@@ -244,8 +244,8 @@
 
 | Gate | Name | Owner | Status | Target Date | Actual Date |
 |------|------|-------|--------|-------------|-------------|
-| QG-0 | Foundation | Project Manager | ⬜ NOT PASSED | [Date] | - |
-| QG-1 | Requirements | Product Owner | ⬜ NOT PASSED | [Date] | - |
+| QG-0 | Foundation | Claude Code | ✅ PASSED | Jan 2025 | Jan 2025 |
+| QG-1 | Requirements | Skanda Prasad | 🟡 IN PROGRESS | Feb 2025 | - |
 | QG-2 | Architecture | Solution Architect | ⬜ NOT PASSED | [Date] | - |
 | QG-3 | Technical | Lead Developer | ⬜ NOT PASSED | [Date] | - |
 | QG-4 | Infrastructure | DevOps Engineer | ⬜ NOT PASSED | [Date] | - |
@@ -271,9 +271,11 @@
 | QG0-AC1 | Project scope clearly defined | ✅ |
 | QG0-AC2 | Team roles assigned with named individuals | ✅ |
 | QG0-AC3 | Azure subscription confirmed and accessible | ✅ |
-| QG0-AC4 | Repository structure created | ⬜ |
+| QG0-AC4 | Repository structure created | ✅ |
 | QG0-AC5 | Naming conventions documented | ✅ |
-| QG0-AC6 | All required documents created and reviewed | 🟡 |
+| QG0-AC6 | All required documents created and reviewed | ✅ |
+
+**QG-0 STATUS: ✅ PASSED** - January 2025
 
 ---
 
@@ -505,6 +507,7 @@
 |---------|------|--------|---------|
 | 1.0 | January 2025 | Skanda Prasad | Initial document creation |
 | 1.1 | January 2025 | Claude Code | Updated team info, task status, and QG-0 progress |
+| 1.2 | January 2025 | Claude Code | QG-0 passed, folder structure created, Phase 1 unlocked |
 
 ---
 
