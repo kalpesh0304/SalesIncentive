@@ -1,8 +1,10 @@
+using Dorise.Incentive.Application.Audit.Services;
 using Dorise.Incentive.Application.Common.Interfaces;
 using Dorise.Incentive.Application.Integrations.Services;
 using Dorise.Incentive.Application.Notifications.Services;
 using Dorise.Incentive.Application.Reports.Services;
 using Dorise.Incentive.Domain.Interfaces;
+using Dorise.Incentive.Infrastructure.Audit;
 using Dorise.Incentive.Infrastructure.Integrations;
 using Dorise.Incentive.Infrastructure.Notifications;
 using Dorise.Incentive.Infrastructure.Persistence;
@@ -24,9 +26,15 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        // Register audit interceptor first (needs HttpContextAccessor)
+        services.AddHttpContextAccessor();
+        services.AddScoped<AuditSaveChangesInterceptor>();
+
         // Database
         var connectionString = configuration.GetConnectionString("DefaultConnection");
-        services.AddDbContext<IncentiveDbContext>(options =>
+        services.AddDbContext<IncentiveDbContext>((serviceProvider, options) =>
+        {
+            var auditInterceptor = serviceProvider.GetRequiredService<AuditSaveChangesInterceptor>();
             options.UseSqlServer(connectionString, sqlOptions =>
             {
                 sqlOptions.MigrationsAssembly(typeof(IncentiveDbContext).Assembly.FullName);
@@ -34,7 +42,9 @@ public static class DependencyInjection
                     maxRetryCount: 3,
                     maxRetryDelay: TimeSpan.FromSeconds(30),
                     errorNumbersToAdd: null);
-            }));
+            })
+            .AddInterceptors(auditInterceptor);
+        });
 
         // Repositories
         services.AddScoped<IEmployeeRepository, EmployeeRepository>();
@@ -59,6 +69,10 @@ public static class DependencyInjection
         services.AddSingleton<ITemplateService, TemplateService>();
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<INotificationService, NotificationService>();
+
+        // Audit Services
+        services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+        services.AddScoped<IAuditService, AuditService>();
 
         return services;
     }

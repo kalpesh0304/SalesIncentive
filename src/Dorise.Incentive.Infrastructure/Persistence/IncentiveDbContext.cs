@@ -28,6 +28,7 @@ public class IncentiveDbContext : DbContext
     public DbSet<PlanAssignment> PlanAssignments => Set<PlanAssignment>();
     public DbSet<Calculation> Calculations => Set<Calculation>();
     public DbSet<Approval> Approvals => Set<Approval>();
+    public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
