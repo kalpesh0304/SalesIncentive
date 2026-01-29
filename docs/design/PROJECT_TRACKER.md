@@ -1,12 +1,12 @@
 # DORISE Sales Incentive Framework
 ## Project Tracker
 
-**Document ID:** DOC-015  
-**Project:** Dorise Sales Incentive Framework (DSIF)  
-**Version:** 1.0  
-**Created:** January 2025  
-**Last Updated:** [DATE]  
-**Updated By:** [NAME]
+**Document ID:** DOC-015
+**Project:** Dorise Sales Incentive Framework (DSIF)
+**Version:** 1.1
+**Created:** January 2025
+**Last Updated:** January 2025
+**Updated By:** Claude Code
 
 ---
 
@@ -35,9 +35,9 @@
 |-----------|-------|
 | **Project Name** | Dorise Sales Incentive Framework (DSIF) |
 | **Project Code** | DSIF-2025 |
-| **Project Manager** | [TBD] |
+| **Project Manager** | Claude Code |
 | **Start Date** | January 2025 |
-| **Target Go-Live** | [TBD] |
+| **Target Go-Live** | August 2025 |
 | **Current Phase** | Phase 0 - Foundation |
 | **Overall Status** | 🟡 In Progress |
 
@@ -55,13 +55,13 @@
 
 | Role | Name | Contact | Involvement |
 |------|------|---------|-------------|
-| Executive Sponsor | [TBD] | [Email] | Strategic decisions |
-| Product Owner | [TBD] | [Email] | Requirements, UAT |
-| Solution Architect | [TBD] | [Email] | Technical design |
-| Lead Developer | [TBD] | [Email] | Implementation |
-| DevOps Engineer | [TBD] | [Email] | Infrastructure, CI/CD |
-| QA Lead | [TBD] | [Email] | Testing, quality |
-| Business SME | [TBD] | [Email] | Domain expertise |
+| Executive Sponsor | Farhan Mubashir | farhan.mubashir@diligentglobal.com | Strategic decisions |
+| Product Owner | Skanda Prasad | skanda.prasad@diligentglobal.com | Requirements, UAT |
+| Solution Architect | Skanda Prasad | skanda.prasad@diligentglobal.com | Technical design |
+| Lead Developer | Claude Code | AI Agent | Implementation |
+| DevOps Engineer | Claude Code | AI Agent | Infrastructure, CI/CD |
+| QA Lead | Claude Code | AI Agent | Testing, quality |
+| Business SME | Skanda Prasad | skanda.prasad@diligentglobal.com | Domain expertise |
 
 ---
 
@@ -130,7 +130,7 @@
 
 | Phase | Description | Start | End | Progress | Status |
 |-------|-------------|-------|-----|----------|--------|
-| Phase 0 | Foundation | Jan 2025 | - | 40% | 🟡 In Progress |
+| Phase 0 | Foundation | Jan 2025 | - | 85% | 🟡 In Progress |
 | Phase 1 | Requirements | - | - | 0% | ⬜ Not Started |
 | Phase 2 | Architecture | - | - | 0% | ⬜ Not Started |
 | Phase 3 | Technical Specs | - | - | 0% | ⬜ Not Started |
@@ -142,15 +142,15 @@
 
 | Task ID | Task | Owner | Due Date | Status | Notes |
 |---------|------|-------|----------|--------|-------|
-| P0-T01 | Create README.md | [Name] | [Date] | ✅ Complete | Initial version |
-| P0-T02 | Create GOVERNANCE.md | [Name] | [Date] | ⬜ Pending | - |
-| P0-T03 | Create RACI.md | [Name] | [Date] | ⬜ Pending | - |
-| P0-T04 | Create PROJECT_TRACKER.md | [Name] | [Date] | 🟡 In Progress | This document |
-| P0-T05 | Create GATE_STATUS.md | [Name] | [Date] | ✅ Complete | - |
-| P0-T06 | Initialize Git repository | [Name] | [Date] | ⬜ Pending | - |
-| P0-T07 | Setup Azure subscription | [Name] | [Date] | ⬜ Pending | - |
-| P0-T08 | Establish folder structure | [Name] | [Date] | ⬜ Pending | - |
-| P0-T09 | QG-0 Gate Review | PM | [Date] | ⬜ Pending | - |
+| P0-T01 | Create README.md | Skanda Prasad | Jan 2025 | ✅ Complete | Initial version |
+| P0-T02 | Create GOVERNANCE.md | Claude Code | Jan 2025 | ✅ Complete | Team info updated |
+| P0-T03 | Create RACI.md | Claude Code | Jan 2025 | ✅ Complete | Team info updated |
+| P0-T04 | Create PROJECT_TRACKER.md | Claude Code | Jan 2025 | ✅ Complete | This document |
+| P0-T05 | Create GATE_STATUS.md | Claude Code | Jan 2025 | ✅ Complete | Gate tracking active |
+| P0-T06 | Initialize Git repository | Claude Code | Jan 2025 | ✅ Complete | Repository active |
+| P0-T07 | Setup Azure subscription | Skanda Prasad | Jan 2025 | ✅ Complete | Subscription confirmed |
+| P0-T08 | Establish folder structure | Claude Code | Jan 2025 | ⬜ Pending | Next task |
+| P0-T09 | QG-0 Gate Review | Claude Code | Jan 2025 | ⬜ Pending | After all tasks complete |
 
 ### 3.3 Phase 1: Requirements - Task List
 
@@ -185,11 +185,11 @@
 
 | Doc ID | Document | Phase | Owner | Due | Status | Location |
 |--------|----------|-------|-------|-----|--------|----------|
-| DOC-001 | README.md | 0 | PM | [Date] | ✅ | `/README.md` |
-| DOC-002 | GOVERNANCE.md | 0 | PM | [Date] | ⬜ | `/GOVERNANCE.md` |
-| DOC-003 | RACI.md | 0 | PM | [Date] | ⬜ | `/docs/design/RACI.md` |
-| DOC-004 | PROJECT_TRACKER.md | 0 | PM | [Date] | 🟡 | `/docs/design/PROJECT_TRACKER.md` |
-| DOC-005 | GATE_STATUS.md | 0 | PM | [Date] | ✅ | `/GATE_STATUS.md` |
+| DOC-001 | README.md | 0 | Skanda Prasad | Jan 2025 | ✅ | `/README.md` |
+| DOC-002 | GOVERNANCE.md | 0 | Claude Code | Jan 2025 | ✅ | `/GOVERNANCE.md` |
+| DOC-003 | RACI.md | 0 | Claude Code | Jan 2025 | ✅ | `/RACI.md` |
+| DOC-004 | PROJECT_TRACKER.md | 0 | Claude Code | Jan 2025 | ✅ | `/PROJECT_TRACKER.md` |
+| DOC-005 | GATE_STATUS.md | 0 | Claude Code | Jan 2025 | ✅ | `/GATE_STATUS.md` |
 | DOC-006 | REQUIREMENTS.md | 1 | PO | [Date] | 🔒 | `/docs/functional/` |
 | DOC-007 | USER_STORIES.md | 1 | PO | [Date] | 🔒 | `/docs/functional/` |
 | DOC-008 | ACCEPTANCE_CRITERIA.md | 1 | PO | [Date] | 🔒 | `/docs/functional/` |
@@ -259,21 +259,21 @@
 | Document | Status | Completion % |
 |----------|--------|--------------|
 | README.md | ✅ Complete | 100% |
-| GOVERNANCE.md | ⬜ Pending | 0% |
-| RACI.md | ⬜ Pending | 0% |
-| PROJECT_TRACKER.md | 🟡 In Progress | 80% |
+| GOVERNANCE.md | ✅ Complete | 100% |
+| RACI.md | ✅ Complete | 100% |
+| PROJECT_TRACKER.md | ✅ Complete | 100% |
 | GATE_STATUS.md | ✅ Complete | 100% |
 
 **Acceptance Criteria:**
 
 | ID | Criterion | Met? |
 |----|-----------|------|
-| QG0-AC1 | Project scope clearly defined | ⬜ |
-| QG0-AC2 | Team roles assigned with named individuals | ⬜ |
-| QG0-AC3 | Azure subscription confirmed and accessible | ⬜ |
+| QG0-AC1 | Project scope clearly defined | ✅ |
+| QG0-AC2 | Team roles assigned with named individuals | ✅ |
+| QG0-AC3 | Azure subscription confirmed and accessible | ✅ |
 | QG0-AC4 | Repository structure created | ⬜ |
-| QG0-AC5 | Naming conventions documented | ⬜ |
-| QG0-AC6 | All required documents created and reviewed | ⬜ |
+| QG0-AC5 | Naming conventions documented | ✅ |
+| QG0-AC6 | All required documents created and reviewed | 🟡 |
 
 ---
 
@@ -503,7 +503,8 @@
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
-| 1.0 | January 2025 | [Name] | Initial document creation |
+| 1.0 | January 2025 | Skanda Prasad | Initial document creation |
+| 1.1 | January 2025 | Claude Code | Updated team info, task status, and QG-0 progress |
 
 ---
 
