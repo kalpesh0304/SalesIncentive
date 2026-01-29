@@ -31,6 +31,10 @@ public class IncentiveDbContext : DbContext
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<Role> Roles => Set<Role>();
     public DbSet<UserRole> UserRoles => Set<UserRole>();
+    public DbSet<SystemConfiguration> SystemConfigurations => Set<SystemConfiguration>();
+    public DbSet<FeatureFlag> FeatureFlags => Set<FeatureFlag>();
+    public DbSet<EmailTemplate> EmailTemplates => Set<EmailTemplate>();
+    public DbSet<CalculationParameter> CalculationParameters => Set<CalculationParameter>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

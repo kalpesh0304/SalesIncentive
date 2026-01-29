@@ -1,5 +1,6 @@
 using Dorise.Incentive.Application.Audit.Services;
 using Dorise.Incentive.Application.Common.Interfaces;
+using Dorise.Incentive.Application.Configuration.Services;
 using Dorise.Incentive.Application.Dashboard.Services;
 using Dorise.Incentive.Application.Integrations.Services;
 using Dorise.Incentive.Application.Notifications.Services;
@@ -7,6 +8,7 @@ using Dorise.Incentive.Application.Reports.Services;
 using Dorise.Incentive.Application.Security.Services;
 using Dorise.Incentive.Domain.Interfaces;
 using Dorise.Incentive.Infrastructure.Audit;
+using Dorise.Incentive.Infrastructure.Configuration;
 using Dorise.Incentive.Infrastructure.Dashboard;
 using Dorise.Incentive.Infrastructure.Integrations;
 using Dorise.Incentive.Infrastructure.Notifications;
@@ -102,6 +104,17 @@ public static class DependencyInjection
 
         // Memory cache for permission caching
         services.AddMemoryCache();
+
+        // Configuration Services
+        services.AddScoped<IConfigurationRepository, ConfigurationRepository>();
+        services.AddScoped<IFeatureFlagRepository, FeatureFlagRepository>();
+        services.AddScoped<IEmailTemplateRepository, EmailTemplateRepository>();
+        services.AddScoped<ICalculationParameterRepository, CalculationParameterRepository>();
+        services.AddScoped<IConfigurationService, ConfigurationService>();
+        services.AddScoped<IFeatureFlagService, FeatureFlagService>();
+        services.AddScoped<IEmailTemplateService, EmailTemplateService>();
+        services.AddScoped<ICalculationParameterService, CalculationParameterService>();
+        services.AddScoped<IConfigurationExportService, ConfigurationExportService>();
 
         return services;
     }
