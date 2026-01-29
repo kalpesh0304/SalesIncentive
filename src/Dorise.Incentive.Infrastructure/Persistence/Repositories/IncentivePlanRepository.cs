@@ -104,4 +104,12 @@ public class IncentivePlanRepository : AggregateRepositoryBase<IncentivePlan>, I
             .OrderBy(p => p.EffectivePeriod.StartDate)
             .ToListAsync(cancellationToken);
     }
+
+    public async Task<Slab?> GetSlabByIdAsync(
+        Guid slabId,
+        CancellationToken cancellationToken = default)
+    {
+        return await Context.Set<Slab>()
+            .FirstOrDefaultAsync(s => s.Id == slabId, cancellationToken);
+    }
 }

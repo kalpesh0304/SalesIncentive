@@ -1,4 +1,5 @@
 using Dorise.Incentive.Application.Common.Interfaces;
+using Dorise.Incentive.Application.Reports.Services;
 using Dorise.Incentive.Domain.Interfaces;
 using Dorise.Incentive.Infrastructure.Persistence;
 using Dorise.Incentive.Infrastructure.Persistence.Repositories;
@@ -43,6 +44,7 @@ public static class DependencyInjection
 
         // Services
         services.AddScoped<IDateTimeService, DateTimeService>();
+        services.AddScoped<IExportService, ExportService>();
 
         return services;
     }

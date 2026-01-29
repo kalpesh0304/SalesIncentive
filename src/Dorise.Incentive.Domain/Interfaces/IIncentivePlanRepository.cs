@@ -62,4 +62,9 @@ public interface IIncentivePlanRepository : IAggregateRepository<IncentivePlan>
     Task<IReadOnlyList<IncentivePlan>> GetOverlappingPlansAsync(
         DateRange period,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets a slab by its ID.
+    /// </summary>
+    Task<Slab?> GetSlabByIdAsync(Guid slabId, CancellationToken cancellationToken = default);
 }

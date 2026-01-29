@@ -73,4 +73,9 @@ public interface IEmployeeRepository : IAggregateRepository<Employee>
         string searchTerm,
         int maxResults = 20,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets all active employees.
+    /// </summary>
+    Task<IReadOnlyList<Employee>> GetAllActiveAsync(CancellationToken cancellationToken = default);
 }

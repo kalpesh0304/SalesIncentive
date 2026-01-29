@@ -118,4 +118,13 @@ public class EmployeeRepository : AggregateRepositoryBase<Employee>, IEmployeeRe
             .ThenBy(e => e.LastName)
             .ToListAsync(cancellationToken);
     }
+
+    public async Task<IReadOnlyList<Employee>> GetAllActiveAsync(CancellationToken cancellationToken = default)
+    {
+        return await DbSet
+            .Where(e => e.Status == EmployeeStatus.Active || e.Status == EmployeeStatus.Probation)
+            .OrderBy(e => e.FirstName)
+            .ThenBy(e => e.LastName)
+            .ToListAsync(cancellationToken);
+    }
 }
