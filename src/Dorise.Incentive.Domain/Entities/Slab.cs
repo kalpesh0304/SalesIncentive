@@ -16,6 +16,11 @@ public class Slab : AuditableEntity
     public int Order { get; private set; }
     public string? Description { get; private set; }
 
+    /// <summary>
+    /// Alias for Description for convenience.
+    /// </summary>
+    public string? Name => Description;
+
     private Slab() { } // EF Core constructor
 
     internal static Slab Create(

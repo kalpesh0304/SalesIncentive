@@ -119,4 +119,15 @@ public class PlanAssignmentRepository : IPlanAssignmentRepository
     {
         _context.PlanAssignments.Remove(assignment);
     }
+
+    public async Task<bool> HasActiveAssignmentAsync(
+        Guid employeeId,
+        Guid planId,
+        CancellationToken cancellationToken = default)
+    {
+        return await _context.PlanAssignments
+            .AnyAsync(a => a.EmployeeId == employeeId &&
+                         a.IncentivePlanId == planId &&
+                         a.IsActive, cancellationToken);
+    }
 }

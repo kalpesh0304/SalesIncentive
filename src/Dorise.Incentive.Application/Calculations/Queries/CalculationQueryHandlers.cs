@@ -223,7 +223,7 @@ public class PreviewCalculationQueryHandler : IQueryHandler<PreviewCalculationQu
             employee,
             plan,
             request.ActualValue,
-            new Domain.ValueObjects.CalculationPeriod(request.PeriodStart, request.PeriodEnd));
+            Domain.ValueObjects.DateRange.Create(request.PeriodStart, request.PeriodEnd));
 
         var breakdown = new List<CalculationBreakdownDto>
         {

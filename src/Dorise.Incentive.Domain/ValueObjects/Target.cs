@@ -14,6 +14,11 @@ public sealed class Target : ValueObject
     public AchievementType AchievementType { get; }
     public string? MetricUnit { get; }
 
+    /// <summary>
+    /// Alias for TargetValue for convenience.
+    /// </summary>
+    public decimal Value => TargetValue;
+
     private Target(decimal targetValue, decimal minimumThreshold, AchievementType achievementType, string? metricUnit)
     {
         TargetValue = targetValue;

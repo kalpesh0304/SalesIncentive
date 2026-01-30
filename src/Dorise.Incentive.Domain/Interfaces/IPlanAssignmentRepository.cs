@@ -65,4 +65,12 @@ public interface IPlanAssignmentRepository
     /// Removes a plan assignment.
     /// </summary>
     void Remove(PlanAssignment assignment);
+
+    /// <summary>
+    /// Checks if an employee has an active assignment for a plan.
+    /// </summary>
+    Task<bool> HasActiveAssignmentAsync(
+        Guid employeeId,
+        Guid planId,
+        CancellationToken cancellationToken = default);
 }
