@@ -86,7 +86,7 @@ public class RunBatchCalculationCommandHandler : ICommandHandler<RunBatchCalcula
         {
             // Get employees by department
             employees = await _unitOfWork.Employees.GetByDepartmentAsync(
-                request.DepartmentId.Value, cancellationToken);
+                request.DepartmentId.Value, cancellationToken: cancellationToken);
         }
         else
         {

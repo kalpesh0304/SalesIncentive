@@ -136,14 +136,14 @@ public class ExportCalculationsQueryHandler : IQueryHandler<ExportCalculationsQu
         var calculations = await _unitOfWork.Calculations.GetByPeriodAsync(
             request.PeriodStart,
             request.PeriodEnd,
-            cancellationToken);
+            cancellationToken: cancellationToken);
 
         // Filter by department if specified
         if (request.DepartmentId.HasValue)
         {
             var employeeIds = (await _unitOfWork.Employees.GetByDepartmentAsync(
                 request.DepartmentId.Value,
-                cancellationToken)).Select(e => e.Id).ToHashSet();
+                cancellationToken: cancellationToken)).Select(e => e.Id).ToHashSet();
 
             calculations = calculations.Where(c => employeeIds.Contains(c.EmployeeId)).ToList();
         }
@@ -231,14 +231,14 @@ public class GetPeriodComparisonQueryHandler : IQueryHandler<GetPeriodComparison
             var calculations = await _unitOfWork.Calculations.GetByPeriodAsync(
                 period.StartDate,
                 period.EndDate,
-                cancellationToken);
+                cancellationToken: cancellationToken);
 
             // Filter by department if specified
             if (request.DepartmentId.HasValue)
             {
                 var employeeIds = (await _unitOfWork.Employees.GetByDepartmentAsync(
                     request.DepartmentId.Value,
-                    cancellationToken)).Select(e => e.Id).ToHashSet();
+                    cancellationToken: cancellationToken)).Select(e => e.Id).ToHashSet();
 
                 calculations = calculations.Where(c => employeeIds.Contains(c.EmployeeId)).ToList();
             }

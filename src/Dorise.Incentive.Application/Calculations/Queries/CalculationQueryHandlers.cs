@@ -296,7 +296,7 @@ public class PreviewCalculationQueryHandler : IQueryHandler<PreviewCalculationQu
             CapAmount = capAmount,
             IsBelowThreshold = !plan.Target.MeetsMinimumThreshold(request.ActualValue),
             IsEligible = eligibility.IsEligible,
-            IneligibilityReason = eligibility.IsEligible ? null : string.Join("; ", eligibility.Reasons),
+            IneligibilityReason = eligibility.IsEligible ? null : eligibility.Reason,
             Breakdown = breakdown
         };
 
@@ -391,7 +391,7 @@ public class GetCalculationHistoryQueryHandler : IQueryHandler<GetCalculationHis
                 {
                     Timestamp = approval.ActionDate ?? approval.CreatedAt,
                     Action = approval.Status.ToString(),
-                    PerformedBy = approval.ApproverEmail ?? "Unknown",
+                    PerformedBy = approval.Approver?.Email ?? "Unknown",
                     Details = approval.Comments,
                     NewStatus = approval.Status == ApprovalStatus.Approved
                         ? CalculationStatus.Approved

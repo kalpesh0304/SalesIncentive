@@ -73,4 +73,13 @@ public interface IPlanAssignmentRepository
         Guid employeeId,
         Guid planId,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Checks if an employee has an active assignment for a plan as of a specific date.
+    /// </summary>
+    Task<bool> HasActiveAssignmentAsync(
+        Guid employeeId,
+        Guid planId,
+        DateTime asOfDate,
+        CancellationToken cancellationToken = default);
 }

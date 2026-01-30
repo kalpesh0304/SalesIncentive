@@ -130,4 +130,18 @@ public class PlanAssignmentRepository : IPlanAssignmentRepository
                          a.IncentivePlanId == planId &&
                          a.IsActive, cancellationToken);
     }
+
+    public async Task<bool> HasActiveAssignmentAsync(
+        Guid employeeId,
+        Guid planId,
+        DateTime asOfDate,
+        CancellationToken cancellationToken = default)
+    {
+        return await _context.PlanAssignments
+            .AnyAsync(a => a.EmployeeId == employeeId &&
+                         a.IncentivePlanId == planId &&
+                         a.IsActive &&
+                         a.EffectivePeriod.StartDate <= asOfDate &&
+                         a.EffectivePeriod.EndDate >= asOfDate, cancellationToken);
+    }
 }
