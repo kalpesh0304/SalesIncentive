@@ -32,6 +32,11 @@ public interface IUnitOfWork : IDisposable
     IApprovalRepository Approvals { get; }
 
     /// <summary>
+    /// Gets the plan assignment repository.
+    /// </summary>
+    IPlanAssignmentRepository PlanAssignments { get; }
+
+    /// <summary>
     /// Saves all changes made in this unit of work to the database.
     /// </summary>
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

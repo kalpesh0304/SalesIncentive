@@ -59,7 +59,7 @@ public class Slab : AuditableEntity
         return baseAmount.Multiply(Percentage.Create(PayoutRate));
     }
 
-    internal void SetOrder(int order)
+    public void SetOrder(int order)
     {
         Order = order;
     }
