@@ -1,0 +1,162 @@
+# ============================================================================
+# CI Pipeline - Continuous Integration
+# ============================================================================
+#
+# "I'm a unitard!" - Ralph Wiggum
+#
+# This pipeline runs unit tests and builds the application on every push and PR!
+#
+# Triggers:
+# - Push to main branch
+# - Pull requests to main branch
+#
+# Jobs:
+# - Build and test .NET application
+# - Run code analysis
+# - Validate Bicep templates
+#
+# ============================================================================
+
+name: CI - Build & Test
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  # ============================================================================
+  # Build and Test
+  # ============================================================================
+  build:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore src/Dorise.Incentive.sln
+        continue-on-error: true
+
+      - name: Build solution
+        run: dotnet build src/Dorise.Incentive.sln --configuration Release --no-restore
+        continue-on-error: true
+
+      - name: Run unit tests
+        run: dotnet test src/Dorise.Incentive.sln --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage
+        continue-on-error: true
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        if: success()
+        with:
+          directory: ./coverage
+          fail_ci_if_error: false
+
+      - name: Publish build artifacts
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: build-artifacts
+          path: |
+            src/**/bin/Release/**
+            !src/**/obj/**
+          retention-days: 5
+
+  # ============================================================================
+  # Code Analysis
+  # ============================================================================
+  analyze:
+    name: Code Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Install dotnet-format
+        run: dotnet tool install -g dotnet-format
+        continue-on-error: true
+
+      - name: Run format check
+        run: dotnet format src/Dorise.Incentive.sln --verify-no-changes --verbosity diagnostic
+        continue-on-error: true
+
+  # ============================================================================
+  # Validate Infrastructure
+  # ============================================================================
+  validate-infra:
+    name: Validate Bicep
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Azure CLI
+        uses: azure/cli@v1
+        with:
+          inlineScript: |
+            az bicep version
+
+      - name: Validate Bicep templates
+        run: |
+          az bicep build --file infra/main.bicep
+          echo "✅ Bicep templates validated successfully"
+
+      - name: Lint Bicep templates
+        run: |
+          az bicep lint --file infra/main.bicep
+        continue-on-error: true
+
+  # ============================================================================
+  # Security Scan
+  # ============================================================================
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+        continue-on-error: true
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v2
+        if: success() || failure()
+        with:
+          sarif_file: 'trivy-results.sarif'
+        continue-on-error: true

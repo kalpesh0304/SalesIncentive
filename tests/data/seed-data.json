@@ -1,0 +1,334 @@
+{
+  "_comment": "DSIF Database Seed Data - Initial setup data for testing",
+  "_ralphQuote": "I'm a unitard! - Ralph Wiggum. Our seed data is anything but uniform - it covers every scenario!",
+  "_version": "1.0",
+  "_lastUpdated": "2025-01",
+
+  "departments": [
+    {
+      "id": "DEPT-001",
+      "code": "SALES",
+      "name": "Sales",
+      "description": "Direct sales team",
+      "costCenter": "CC-100",
+      "isActive": true
+    },
+    {
+      "id": "DEPT-002",
+      "code": "ENTERPRISE",
+      "name": "Enterprise Sales",
+      "description": "Enterprise and key accounts",
+      "costCenter": "CC-110",
+      "isActive": true
+    },
+    {
+      "id": "DEPT-003",
+      "code": "PRESALES",
+      "name": "Pre-Sales",
+      "description": "Technical pre-sales support",
+      "costCenter": "CC-120",
+      "isActive": true
+    },
+    {
+      "id": "DEPT-004",
+      "code": "MARKETING",
+      "name": "Marketing",
+      "description": "Marketing and lead generation",
+      "costCenter": "CC-200",
+      "isActive": true
+    },
+    {
+      "id": "DEPT-005",
+      "code": "SUPPORT",
+      "name": "Customer Support",
+      "description": "Post-sales support",
+      "costCenter": "CC-300",
+      "isActive": true
+    }
+  ],
+
+  "designations": [
+    {
+      "id": "DESIG-001",
+      "code": "SE",
+      "name": "Sales Executive",
+      "level": 1,
+      "incentiveEligible": true
+    },
+    {
+      "id": "DESIG-002",
+      "code": "SR",
+      "name": "Sales Representative",
+      "level": 2,
+      "incentiveEligible": true
+    },
+    {
+      "id": "DESIG-003",
+      "code": "SM",
+      "name": "Sales Manager",
+      "level": 3,
+      "incentiveEligible": true
+    },
+    {
+      "id": "DESIG-004",
+      "code": "RD",
+      "name": "Regional Director",
+      "level": 4,
+      "incentiveEligible": true
+    },
+    {
+      "id": "DESIG-005",
+      "code": "VP",
+      "name": "Vice President Sales",
+      "level": 5,
+      "incentiveEligible": true
+    },
+    {
+      "id": "DESIG-006",
+      "code": "PSC",
+      "name": "Pre-Sales Consultant",
+      "level": 2,
+      "incentiveEligible": true
+    },
+    {
+      "id": "DESIG-007",
+      "code": "CSR",
+      "name": "Customer Support Rep",
+      "level": 1,
+      "incentiveEligible": false
+    }
+  ],
+
+  "regions": [
+    {
+      "id": "REG-001",
+      "code": "NORTH",
+      "name": "North Region",
+      "countries": ["India"],
+      "states": ["Delhi", "Punjab", "Haryana", "UP"]
+    },
+    {
+      "id": "REG-002",
+      "code": "SOUTH",
+      "name": "South Region",
+      "countries": ["India"],
+      "states": ["Karnataka", "Tamil Nadu", "Kerala", "AP", "Telangana"]
+    },
+    {
+      "id": "REG-003",
+      "code": "WEST",
+      "name": "West Region",
+      "countries": ["India"],
+      "states": ["Maharashtra", "Gujarat", "Rajasthan", "Goa"]
+    },
+    {
+      "id": "REG-004",
+      "code": "EAST",
+      "name": "East Region",
+      "countries": ["India"],
+      "states": ["West Bengal", "Odisha", "Bihar", "Jharkhand"]
+    }
+  ],
+
+  "currencies": [
+    {
+      "code": "INR",
+      "name": "Indian Rupee",
+      "symbol": "₹",
+      "decimalPlaces": 2,
+      "isDefault": true
+    },
+    {
+      "code": "USD",
+      "name": "US Dollar",
+      "symbol": "$",
+      "decimalPlaces": 2,
+      "isDefault": false
+    }
+  ],
+
+  "exchangeRates": [
+    {
+      "fromCurrency": "USD",
+      "toCurrency": "INR",
+      "rate": 83.50,
+      "effectiveDate": "2024-01-01",
+      "expiryDate": "2024-12-31"
+    }
+  ],
+
+  "fiscalPeriods": [
+    {
+      "id": "FY-2024",
+      "name": "Fiscal Year 2024",
+      "startDate": "2024-04-01",
+      "endDate": "2025-03-31",
+      "isActive": true,
+      "quarters": [
+        {
+          "id": "Q1-2024",
+          "name": "Q1 FY2024",
+          "startDate": "2024-04-01",
+          "endDate": "2024-06-30"
+        },
+        {
+          "id": "Q2-2024",
+          "name": "Q2 FY2024",
+          "startDate": "2024-07-01",
+          "endDate": "2024-09-30"
+        },
+        {
+          "id": "Q3-2024",
+          "name": "Q3 FY2024",
+          "startDate": "2024-10-01",
+          "endDate": "2024-12-31"
+        },
+        {
+          "id": "Q4-2024",
+          "name": "Q4 FY2024",
+          "startDate": "2025-01-01",
+          "endDate": "2025-03-31"
+        }
+      ]
+    }
+  ],
+
+  "metrics": [
+    {
+      "id": "METRIC-001",
+      "code": "REVENUE",
+      "name": "Revenue",
+      "description": "Total revenue generated",
+      "dataType": "Currency",
+      "aggregationType": "Sum"
+    },
+    {
+      "id": "METRIC-002",
+      "code": "NEWCUST",
+      "name": "New Customers",
+      "description": "Number of new customers acquired",
+      "dataType": "Integer",
+      "aggregationType": "Count"
+    },
+    {
+      "id": "METRIC-003",
+      "code": "DEALS",
+      "name": "Deals Closed",
+      "description": "Number of deals closed",
+      "dataType": "Integer",
+      "aggregationType": "Count"
+    },
+    {
+      "id": "METRIC-004",
+      "code": "MARGIN",
+      "name": "Gross Margin",
+      "description": "Gross margin percentage",
+      "dataType": "Percentage",
+      "aggregationType": "Average"
+    },
+    {
+      "id": "METRIC-005",
+      "code": "RENEWAL",
+      "name": "Renewal Rate",
+      "description": "Customer renewal rate",
+      "dataType": "Percentage",
+      "aggregationType": "Average"
+    }
+  ],
+
+  "approvalLevels": [
+    {
+      "id": "LEVEL-1",
+      "name": "Manager Approval",
+      "sequence": 1,
+      "thresholdMin": 0,
+      "thresholdMax": 25000,
+      "approverRole": "Sales Manager"
+    },
+    {
+      "id": "LEVEL-2",
+      "name": "Director Approval",
+      "sequence": 2,
+      "thresholdMin": 25001,
+      "thresholdMax": 100000,
+      "approverRole": "Regional Director"
+    },
+    {
+      "id": "LEVEL-3",
+      "name": "VP Approval",
+      "sequence": 3,
+      "thresholdMin": 100001,
+      "thresholdMax": null,
+      "approverRole": "Vice President Sales"
+    }
+  ],
+
+  "systemConfiguration": {
+    "calculationPrecision": 2,
+    "roundingMode": "HalfUp",
+    "defaultCurrency": "INR",
+    "approvalTimeoutDays": 5,
+    "reminderAfterDays": 2,
+    "escalationAfterDays": 5,
+    "maxBatchSize": 1000,
+    "auditRetentionDays": 365,
+    "sessionTimeoutMinutes": 30
+  },
+
+  "notificationTemplates": [
+    {
+      "id": "NOTIF-001",
+      "code": "CALC_COMPLETE",
+      "name": "Calculation Complete",
+      "subject": "Incentive Calculation Completed",
+      "bodyTemplate": "Dear {{EmployeeName}}, your incentive calculation for {{Period}} is complete. Amount: {{Amount}}"
+    },
+    {
+      "id": "NOTIF-002",
+      "code": "APPROVAL_PENDING",
+      "name": "Pending Approval",
+      "subject": "Incentive Approval Required",
+      "bodyTemplate": "Dear {{ApproverName}}, you have {{Count}} pending approvals. Please review at your earliest."
+    },
+    {
+      "id": "NOTIF-003",
+      "code": "APPROVAL_COMPLETE",
+      "name": "Approval Complete",
+      "subject": "Incentive Approved",
+      "bodyTemplate": "Dear {{EmployeeName}}, your incentive of {{Amount}} for {{Period}} has been approved."
+    }
+  ],
+
+  "roles": [
+    {
+      "id": "ROLE-001",
+      "code": "ADMIN",
+      "name": "System Administrator",
+      "permissions": ["*"]
+    },
+    {
+      "id": "ROLE-002",
+      "code": "MANAGER",
+      "name": "Sales Manager",
+      "permissions": ["employees.view", "employees.edit", "calculations.create", "calculations.view", "approvals.approve", "reports.view"]
+    },
+    {
+      "id": "ROLE-003",
+      "code": "EMPLOYEE",
+      "name": "Employee",
+      "permissions": ["dashboard.view", "calculations.viewOwn", "reports.viewOwn"]
+    },
+    {
+      "id": "ROLE-004",
+      "code": "FINANCE",
+      "name": "Finance Analyst",
+      "permissions": ["calculations.view", "calculations.create", "approvals.view", "approvals.approve", "reports.view", "reports.export"]
+    },
+    {
+      "id": "ROLE-005",
+      "code": "HR",
+      "name": "HR Administrator",
+      "permissions": ["employees.view", "employees.create", "employees.edit", "employees.delete"]
+    }
+  ]
+}

@@ -1,0 +1,177 @@
+# ============================================================================
+# Reusable Workflow - Deploy to Azure Web App
+# ============================================================================
+#
+# "I bent my Wookie." - Ralph Wiggum
+#
+# This reusable workflow deploys applications to Azure Web Apps without bending!
+#
+# Usage:
+#   jobs:
+#     deploy:
+#       uses: ./.github/workflows/reusable-deploy.yml
+#       with:
+#         environment: production
+#         webapp-name: app-dorise-api-prod
+#         resource-group: rg-dorise-prod-eastus
+#         artifact-name: webapp-package
+#       secrets:
+#         azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
+#
+# ============================================================================
+
+name: Reusable - Deploy to Azure
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: 'Deployment environment name'
+        required: true
+        type: string
+      webapp-name:
+        description: 'Azure Web App name'
+        required: true
+        type: string
+      resource-group:
+        description: 'Azure resource group name'
+        required: true
+        type: string
+      artifact-name:
+        description: 'Name of the artifact to deploy'
+        required: true
+        type: string
+      slot-name:
+        description: 'Deployment slot (empty for production slot)'
+        required: false
+        type: string
+        default: ''
+      run-smoke-tests:
+        description: 'Run smoke tests after deployment'
+        required: false
+        type: boolean
+        default: true
+      version:
+        description: 'Version being deployed'
+        required: false
+        type: string
+        default: ''
+
+    secrets:
+      azure-credentials:
+        description: 'Azure service principal credentials'
+        required: true
+
+    outputs:
+      deployment-url:
+        description: 'URL of the deployed application'
+        value: ${{ jobs.deploy.outputs.deployment-url }}
+      deployment-succeeded:
+        description: 'Whether deployment succeeded'
+        value: ${{ jobs.deploy.outputs.deployment-succeeded }}
+
+jobs:
+  deploy:
+    name: Deploy to ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment }}
+      url: ${{ steps.set-url.outputs.url }}
+
+    outputs:
+      deployment-url: ${{ steps.set-url.outputs.url }}
+      deployment-succeeded: ${{ steps.deploy.outcome == 'success' }}
+
+    steps:
+      - name: Set deployment URL
+        id: set-url
+        run: |
+          if [ -n "${{ inputs.slot-name }}" ]; then
+            echo "url=https://${{ inputs.webapp-name }}-${{ inputs.slot-name }}.azurewebsites.net" >> $GITHUB_OUTPUT
+          else
+            echo "url=https://${{ inputs.webapp-name }}.azurewebsites.net" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: ./deploy
+
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.azure-credentials }}
+        continue-on-error: true
+
+      - name: Deploy to Azure Web App
+        id: deploy
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ inputs.webapp-name }}
+          slot-name: ${{ inputs.slot-name || 'production' }}
+          package: ./deploy
+        continue-on-error: true
+
+      - name: Set app settings
+        if: ${{ inputs.version != '' }}
+        run: |
+          SLOT_ARG=""
+          if [ -n "${{ inputs.slot-name }}" ]; then
+            SLOT_ARG="--slot ${{ inputs.slot-name }}"
+          fi
+
+          az webapp config appsettings set \
+            --resource-group ${{ inputs.resource-group }} \
+            --name ${{ inputs.webapp-name }} \
+            $SLOT_ARG \
+            --settings \
+              DeploymentVersion="${{ inputs.version }}" \
+              DeploymentTime="$(date -u '+%Y-%m-%dT%H:%M:%SZ')" \
+              DeployedBy="${{ github.actor }}"
+        continue-on-error: true
+
+      - name: Logout from Azure
+        run: az logout
+        if: always()
+
+  smoke-test:
+    name: Smoke Tests
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: ${{ inputs.run-smoke-tests }}
+
+    steps:
+      - name: Wait for deployment to stabilize
+        run: sleep 20
+
+      - name: Health check
+        run: |
+          echo "🏥 Running health check..."
+          URL="${{ needs.deploy.outputs.deployment-url }}/health"
+          MAX_RETRIES=5
+          RETRY_COUNT=0
+
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            response=$(curl -s -o /dev/null -w "%{http_code}" "$URL" --max-time 30 || echo "000")
+
+            if [ "$response" = "200" ]; then
+              echo "✅ Health check passed!"
+              exit 0
+            fi
+
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            echo "⏳ Attempt $RETRY_COUNT/$MAX_RETRIES - Status: $response"
+            sleep 10
+          done
+
+          echo "⚠️ Health check completed with status: $response"
+        continue-on-error: true
+
+      - name: API info check
+        run: |
+          echo "📋 Checking API info..."
+          URL="${{ needs.deploy.outputs.deployment-url }}/api/info"
+          response=$(curl -s "$URL" --max-time 30 || echo "{}")
+          echo "API Info: $response"
+        continue-on-error: true

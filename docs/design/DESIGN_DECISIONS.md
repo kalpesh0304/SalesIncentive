@@ -280,6 +280,199 @@ Implement **mandatory Quality Gates** between all project phases.
 
 ---
 
+### DD-005: Implement CQRS Pattern with MediatR
+
+| Attribute | Value |
+|-----------|-------|
+| **Date** | January 2025 |
+| **Decision Maker** | Solution Architect |
+| **Status** | Approved |
+
+#### Context
+The DSIF application has different read and write patterns - complex queries for reporting vs. transactional writes for calculations and approvals. A clean separation of concerns is needed.
+
+#### Options Considered
+
+##### Option A: CQRS with MediatR
+- **Description:** Separate command and query models using MediatR library
+- **Pros:** Clean separation, testable handlers, pipeline behaviors for cross-cutting concerns
+- **Cons:** Additional abstraction layer, learning curve, potential overengineering for simple CRUD
+
+##### Option B: Traditional Service Layer
+- **Description:** Single service layer handling both reads and writes
+- **Pros:** Simpler architecture, familiar pattern, less code
+- **Cons:** Services can become bloated, harder to optimize reads vs. writes separately
+
+##### Option C: Event Sourcing + CQRS
+- **Description:** Full event sourcing with separate read models
+- **Pros:** Complete audit trail, temporal queries, replay capability
+- **Cons:** High complexity, infrastructure requirements, overkill for this use case
+
+#### Decision
+Implement **CQRS pattern using MediatR** for application layer organization.
+
+#### Rationale
+- Clear separation of commands (writes) and queries (reads)
+- Pipeline behaviors enable consistent validation, logging, and transactions
+- Handlers are independently testable
+- Supports different optimization strategies for reads and writes
+- Balance of structure without event sourcing complexity
+
+#### Consequences
+- Application layer organized into Commands and Queries folders
+- Each operation has a dedicated handler
+- FluentValidation integrated via pipeline behavior
+- Audit logging implemented via pipeline behavior
+- Domain events dispatched after command completion
+
+---
+
+### DD-006: Use System-Versioned Temporal Tables for History
+
+| Attribute | Value |
+|-----------|-------|
+| **Date** | January 2025 |
+| **Decision Maker** | Solution Architect |
+| **Status** | Approved |
+
+#### Context
+The DSIF application requires point-in-time queries to reproduce historical calculations exactly. Audit requirements mandate tracking all changes to key entities.
+
+#### Options Considered
+
+##### Option A: SQL Server Temporal Tables
+- **Description:** Native SQL Server system-versioned temporal tables
+- **Pros:** Automatic history tracking, built-in point-in-time queries, database-level guarantee
+- **Cons:** SQL Server specific, schema requirements, storage overhead
+
+##### Option B: Application-Level History Tables
+- **Description:** Custom history tables maintained by application code
+- **Pros:** Database agnostic, full control over what's tracked
+- **Cons:** Complex implementation, risk of gaps, performance overhead
+
+##### Option C: Event Sourcing
+- **Description:** Store all changes as events, derive current state
+- **Pros:** Complete history, replay capability, powerful audit
+- **Cons:** Major architectural change, complexity, infrastructure requirements
+
+#### Decision
+Use **SQL Server System-Versioned Temporal Tables** for Employee and Assignment entities.
+
+#### Rationale
+- Native database feature provides guaranteed history
+- Point-in-time queries with simple FOR SYSTEM_TIME syntax
+- Automatic tracking without application code
+- Azure SQL supports temporal tables
+- Calculation records are immutable (append-only, no history needed)
+
+#### Consequences
+- Employee and Assignment tables created with SYSTEM_VERSIONING
+- History tables automatically maintained by SQL Server
+- EF Core configuration required for temporal table mapping
+- Point-in-time queries available for audit and recalculation
+- Storage planning for history table growth
+
+---
+
+### DD-007: Implement Zero Trust Security Model
+
+| Attribute | Value |
+|-----------|-------|
+| **Date** | January 2025 |
+| **Decision Maker** | Solution Architect |
+| **Status** | Approved |
+
+#### Context
+The DSIF application handles sensitive financial and employee data. Modern security practices require defense in depth rather than perimeter-only security.
+
+#### Options Considered
+
+##### Option A: Zero Trust Architecture
+- **Description:** Never trust, always verify - authenticate and authorize every request
+- **Pros:** Strong security posture, defense in depth, compliance aligned
+- **Cons:** Implementation complexity, potential performance impact, operational overhead
+
+##### Option B: Perimeter Security Only
+- **Description:** Secure the network boundary, trust internal traffic
+- **Pros:** Simpler implementation, less operational overhead
+- **Cons:** Vulnerable to insider threats, lateral movement risk, outdated approach
+
+##### Option C: Hybrid Approach
+- **Description:** Strong perimeter with selective internal controls
+- **Pros:** Balance of security and simplicity
+- **Cons:** May leave gaps, inconsistent security posture
+
+#### Decision
+Implement **Zero Trust Security Model** with defense in depth.
+
+#### Rationale
+- Financial data requires highest security standards
+- Compliance requirements (SOC 2, GDPR) align with zero trust
+- Azure provides native zero trust capabilities
+- Protects against insider threats and compromised credentials
+- Industry best practice for cloud-native applications
+
+#### Consequences
+- All services require authentication (Azure AD)
+- Private endpoints for all data services
+- Network segmentation with NSGs
+- Managed identities for service-to-service auth
+- Comprehensive audit logging
+- Regular access reviews
+
+---
+
+### DD-008: Use OpenAPI/Swagger for API Documentation
+
+| Attribute | Value |
+|-----------|-------|
+| **Date** | January 2025 |
+| **Decision Maker** | Solution Architect |
+| **Status** | Approved |
+
+#### Context
+The DSIF application exposes REST APIs for external integration (payroll, ERP). Clear documentation is essential for consumers.
+
+#### Options Considered
+
+##### Option A: OpenAPI 3.0 with Swashbuckle
+- **Description:** Auto-generated OpenAPI spec from code annotations
+- **Pros:** Single source of truth, always current, interactive documentation
+- **Cons:** Limited customization, requires attribute annotations
+
+##### Option B: Hand-Written API Documentation
+- **Description:** Manually maintained API documentation
+- **Pros:** Full control over format and content
+- **Cons:** Drift from implementation, maintenance burden
+
+##### Option C: API Blueprint / RAML
+- **Description:** Alternative API specification formats
+- **Pros:** Design-first approach, rich tooling
+- **Cons:** Less ecosystem support than OpenAPI, learning curve
+
+#### Decision
+Use **OpenAPI 3.0 specification** with Swashbuckle for auto-generation.
+
+#### Rationale
+- Industry standard for REST API documentation
+- Auto-generation ensures documentation matches implementation
+- Swagger UI provides interactive testing
+- Client SDK generation possible from spec
+- Wide ecosystem of tools and integrations
+
+#### Consequences
+- Swashbuckle.AspNetCore package added to API project
+- XML documentation comments required on controllers
+- Swagger UI available at /swagger endpoint
+- OpenAPI JSON available for client generation
+- API versioning reflected in spec
+
+> *"I'm learnding!"* - Ralph Wiggum
+>
+> These design decisions document our learning journey toward building robust enterprise software.
+
+---
+
 ## Appendix A: Decision Index
 
 | ID | Title | Status | Date |
@@ -288,6 +481,10 @@ Implement **mandatory Quality Gates** between all project phases.
 | DD-002 | Use Blazor Server for Frontend | Approved | January 2025 |
 | DD-003 | Use Azure Functions for Background Processing | Approved | January 2025 |
 | DD-004 | Implement Quality Gate Framework | Approved | January 2025 |
+| DD-005 | Implement CQRS Pattern with MediatR | Approved | January 2025 |
+| DD-006 | Use System-Versioned Temporal Tables for History | Approved | January 2025 |
+| DD-007 | Implement Zero Trust Security Model | Approved | January 2025 |
+| DD-008 | Use OpenAPI/Swagger for API Documentation | Approved | January 2025 |
 
 ---
 
