@@ -1,5 +1,6 @@
 using Dorise.Incentive.Application.Common.Interfaces;
 using Dorise.Incentive.Application.Employees.DTOs;
+using Dorise.Incentive.Domain.ValueObjects;
 using MediatR;
 
 namespace Dorise.Incentive.Application.Employees.Queries.GetEmployeeById;
@@ -25,7 +26,8 @@ public class GetEmployeeByCodeQueryHandler : IRequestHandler<GetEmployeeByCodeQu
 
     public async Task<EmployeeDto?> Handle(GetEmployeeByCodeQuery request, CancellationToken cancellationToken)
     {
-        var employee = await _repository.Employees.GetByCodeAsync(request.Code, cancellationToken);
+        var employeeCode = EmployeeCode.Create(request.Code);
+        var employee = await _repository.Employees.GetByCodeAsync(employeeCode, cancellationToken);
         return employee == null ? null : _mapper.Map<EmployeeDto>(employee);
     }
 }

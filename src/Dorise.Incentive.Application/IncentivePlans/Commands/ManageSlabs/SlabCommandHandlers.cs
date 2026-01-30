@@ -12,6 +12,7 @@ namespace Dorise.Incentive.Application.IncentivePlans.Commands.ManageSlabs;
 
 /// <summary>
 /// Handler for AddSlabCommand.
+/// "I'm learnding!" - Adding slabs to plans!
 /// </summary>
 public class AddSlabCommandHandler : ICommandHandler<AddSlabCommand, SlabDto>
 {
@@ -49,30 +50,25 @@ public class AddSlabCommandHandler : ICommandHandler<AddSlabCommand, SlabDto>
         foreach (var existingSlab in plan.Slabs)
         {
             if (RangesOverlap(request.FromPercentage, request.ToPercentage,
-                existingSlab.FromPercentage.Value, existingSlab.ToPercentage.Value))
+                existingSlab.FromPercentage, existingSlab.ToPercentage))
             {
                 return Result<SlabDto>.Failure(
-                    $"Slab range overlaps with existing slab '{existingSlab.Name}'",
+                    $"Slab range overlaps with existing slab '{existingSlab.Description ?? $"Order {existingSlab.Order}"}'",
                     "OVERLAPPING_RANGE");
             }
         }
 
-        var slab = Slab.Create(
-            request.Name,
-            request.Description,
-            request.Order,
-            Percentage.Create(request.FromPercentage),
-            Percentage.Create(request.ToPercentage),
-            Percentage.Create(request.PayoutPercentage),
-            request.FixedAmount.HasValue ? Money.Create(request.FixedAmount.Value, "INR") : null);
-
-        plan.AddSlab(slab);
+        // Use IncentivePlan.AddSlab which creates the slab internally
+        plan.AddSlab(request.FromPercentage, request.ToPercentage, request.PayoutPercentage);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        _logger.LogInformation("Added slab {SlabId} to plan {PlanId}", slab.Id, plan.Id);
+        // Get the newly added slab (last one added)
+        var newSlab = plan.Slabs.OrderByDescending(s => s.Order).First();
 
-        return Result<SlabDto>.Success(_mapper.Map<SlabDto>(slab));
+        _logger.LogInformation("Added slab {SlabId} to plan {PlanId}", newSlab.Id, plan.Id);
+
+        return Result<SlabDto>.Success(_mapper.Map<SlabDto>(newSlab));
     }
 
     private bool RangesOverlap(decimal from1, decimal to1, decimal from2, decimal to2)
@@ -122,14 +118,16 @@ public class UpdateSlabCommandHandler : ICommandHandler<UpdateSlabCommand, SlabD
                 "INVALID_STATUS");
         }
 
-        slab.Update(
-            request.Name,
-            request.Description,
-            request.Order,
-            Percentage.Create(request.FromPercentage),
-            Percentage.Create(request.ToPercentage),
-            Percentage.Create(request.PayoutPercentage),
-            request.FixedAmount.HasValue ? Money.Create(request.FixedAmount.Value, "INR") : null);
+        slab.UpdateDetails(
+            request.FromPercentage,
+            request.ToPercentage,
+            request.PayoutPercentage,
+            request.Description);
+
+        if (request.Order > 0)
+        {
+            slab.SetOrder(request.Order);
+        }
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -175,7 +173,7 @@ public class RemoveSlabCommandHandler : ICommandHandler<RemoveSlabCommand>
             return Result.Failure("Can only remove slabs from Draft plans", "INVALID_STATUS");
         }
 
-        plan.RemoveSlab(slab);
+        plan.RemoveSlab(request.SlabId);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 

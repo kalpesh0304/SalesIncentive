@@ -1,4 +1,5 @@
 using Dorise.Incentive.Application.Audit.Services;
+using Dorise.Incentive.Application.Common.Interfaces;
 using Dorise.Incentive.Application.Dashboard.Services;
 using Dorise.Incentive.Application.Integrations.Services;
 using Dorise.Incentive.Application.Jobs.Services;
@@ -65,6 +66,10 @@ public static class DependencyInjection
         services.AddScoped<IAuditLogRepository, AuditLogRepository>();
         services.AddScoped<IRoleRepository, RoleRepository>();
         services.AddScoped<IBackgroundJobRepository, BackgroundJobRepository>();
+        services.AddScoped<IPlanAssignmentRepository, PlanAssignmentRepository>();
+
+        // Read-Only Repository Aggregator (for query handlers)
+        services.AddScoped<IReadOnlyRepository, ReadOnlyRepository>();
 
         // Unit of Work
         services.AddScoped<IUnitOfWork, UnitOfWork>();

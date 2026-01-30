@@ -67,4 +67,15 @@ public interface IIncentivePlanRepository : IAggregateRepository<IncentivePlan>
     /// Gets a slab by its ID.
     /// </summary>
     Task<Slab?> GetSlabByIdAsync(Guid slabId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets incentive plans with pagination and filtering.
+    /// </summary>
+    Task<(IReadOnlyList<IncentivePlan> Items, int TotalCount)> GetPagedAsync(
+        int page,
+        int pageSize,
+        PlanStatus? status = null,
+        PlanType? planType = null,
+        string? searchTerm = null,
+        CancellationToken cancellationToken = default);
 }
