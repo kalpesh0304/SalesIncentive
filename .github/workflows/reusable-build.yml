@@ -147,6 +147,15 @@ jobs:
           dotnet publish ${{ inputs.publish-project }} $PUBLISH_ARGS
         continue-on-error: true
 
+      - name: Create placeholder if publish folder is empty
+        if: ${{ inputs.publish-project != '' }}
+        run: |
+          mkdir -p ./publish
+          if [ -z "$(ls -A ./publish 2>/dev/null)" ]; then
+            echo "No build output found - creating placeholder"
+            echo '{"status":"placeholder","message":"No build output - source code not yet implemented"}' > ./publish/placeholder.json
+          fi
+
       - name: Upload build artifact
         if: ${{ inputs.publish-project != '' }}
         uses: actions/upload-artifact@v4
@@ -154,3 +163,4 @@ jobs:
           name: ${{ inputs.artifact-name }}
           path: ./publish
           retention-days: 7
+          if-no-files-found: warn
