@@ -3,6 +3,7 @@ using Dorise.Incentive.Application.Common.Interfaces;
 using Dorise.Incentive.Application.Configuration.Services;
 using Dorise.Incentive.Application.DataTransfer.Services;
 using Dorise.Incentive.Application.Jobs.Services;
+using Dorise.Incentive.Application.Performance.Services;
 using Dorise.Incentive.Application.Dashboard.Services;
 using Dorise.Incentive.Application.Integrations.Services;
 using Dorise.Incentive.Application.Notifications.Services;
@@ -15,6 +16,8 @@ using Dorise.Incentive.Infrastructure.Dashboard;
 using Dorise.Incentive.Infrastructure.DataTransfer;
 using Dorise.Incentive.Infrastructure.Integrations;
 using Dorise.Incentive.Infrastructure.Jobs;
+using Dorise.Incentive.Infrastructure.Caching;
+using Dorise.Incentive.Infrastructure.Performance;
 using Dorise.Incentive.Infrastructure.Notifications;
 using Dorise.Incentive.Infrastructure.Persistence;
 using Dorise.Incentive.Infrastructure.Persistence.Repositories;
@@ -137,6 +140,16 @@ public static class DependencyInjection
         services.AddScoped<IDataTransferTemplateService, DataTransferTemplateService>();
         services.AddScoped<IFileParserService, FileParserService>();
         services.AddScoped<IDataTransferStatisticsService, DataTransferStatisticsService>();
+
+        // Caching Services
+        services.AddDistributedMemoryCache(); // Use Redis in production
+        services.AddSingleton<ICacheService, DistributedCacheService>();
+        services.AddSingleton<IQueryCacheService, QueryCacheService>();
+        services.AddSingleton<IResponseCacheService, ResponseCacheService>();
+
+        // Performance Services
+        services.AddSingleton<IPerformanceMonitorService, PerformanceMonitorService>();
+        services.AddSingleton<ICacheManagementService, CacheManagementService>();
 
         return services;
     }
