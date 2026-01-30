@@ -35,6 +35,8 @@ public class IncentiveDbContext : DbContext
     public DbSet<FeatureFlag> FeatureFlags => Set<FeatureFlag>();
     public DbSet<EmailTemplate> EmailTemplates => Set<EmailTemplate>();
     public DbSet<CalculationParameter> CalculationParameters => Set<CalculationParameter>();
+    public DbSet<BackgroundJob> BackgroundJobs => Set<BackgroundJob>();
+    public DbSet<JobSchedule> JobSchedules => Set<JobSchedule>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -1,6 +1,7 @@
 using Dorise.Incentive.Application.Audit.Services;
 using Dorise.Incentive.Application.Common.Interfaces;
 using Dorise.Incentive.Application.Configuration.Services;
+using Dorise.Incentive.Application.Jobs.Services;
 using Dorise.Incentive.Application.Dashboard.Services;
 using Dorise.Incentive.Application.Integrations.Services;
 using Dorise.Incentive.Application.Notifications.Services;
@@ -11,6 +12,7 @@ using Dorise.Incentive.Infrastructure.Audit;
 using Dorise.Incentive.Infrastructure.Configuration;
 using Dorise.Incentive.Infrastructure.Dashboard;
 using Dorise.Incentive.Infrastructure.Integrations;
+using Dorise.Incentive.Infrastructure.Jobs;
 using Dorise.Incentive.Infrastructure.Notifications;
 using Dorise.Incentive.Infrastructure.Persistence;
 using Dorise.Incentive.Infrastructure.Persistence.Repositories;
@@ -115,6 +117,13 @@ public static class DependencyInjection
         services.AddScoped<IEmailTemplateService, EmailTemplateService>();
         services.AddScoped<ICalculationParameterService, CalculationParameterService>();
         services.AddScoped<IConfigurationExportService, ConfigurationExportService>();
+
+        // Job Services
+        services.AddScoped<IBackgroundJobRepository, BackgroundJobRepository>();
+        services.AddScoped<IJobScheduleRepository, JobScheduleRepository>();
+        services.AddScoped<IJobService, JobService>();
+        services.AddScoped<IJobScheduleService, JobScheduleService>();
+        services.AddScoped<IBatchOperationService, BatchOperationService>();
 
         return services;
     }
