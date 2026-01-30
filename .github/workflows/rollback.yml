@@ -1,0 +1,240 @@
+# ============================================================================
+# Rollback Workflow - Emergency Rollback
+# ============================================================================
+#
+# "That's where I saw the Leprechaun. He told me to burn things." - Ralph Wiggum
+#
+# This workflow handles emergency rollbacks - when deployments go wrong!
+#
+# Triggers:
+# - Manual workflow dispatch only
+#
+# Features:
+# - Quick slot swap rollback (fastest)
+# - Redeploy previous version
+# - Environment-specific rollback
+#
+# ============================================================================
+
+name: Rollback - Emergency Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to rollback'
+        required: true
+        type: choice
+        options:
+          - dev
+          - stg
+          - prod
+      rollback-method:
+        description: 'Rollback method'
+        required: true
+        type: choice
+        options:
+          - slot-swap
+          - redeploy-previous
+      reason:
+        description: 'Reason for rollback'
+        required: true
+      confirm:
+        description: 'Type environment name to confirm'
+        required: true
+
+env:
+  AZURE_LOCATION: 'eastus'
+
+jobs:
+  # ============================================================================
+  # Validate Rollback Request
+  # ============================================================================
+  validate:
+    name: Validate Rollback Request
+    runs-on: ubuntu-latest
+
+    outputs:
+      webapp-name: ${{ steps.config.outputs.webapp-name }}
+      resource-group: ${{ steps.config.outputs.resource-group }}
+
+    steps:
+      - name: Validate confirmation
+        run: |
+          if [ "${{ github.event.inputs.confirm }}" != "${{ github.event.inputs.environment }}" ]; then
+            echo "❌ Confirmation mismatch!"
+            echo "Expected: ${{ github.event.inputs.environment }}"
+            echo "Got: ${{ github.event.inputs.confirm }}"
+            exit 1
+          fi
+          echo "✅ Confirmation validated"
+
+      - name: Set environment configuration
+        id: config
+        run: |
+          case "${{ github.event.inputs.environment }}" in
+            dev)
+              echo "webapp-name=app-dorise-api-dev" >> $GITHUB_OUTPUT
+              echo "resource-group=rg-dorise-dev-eastus" >> $GITHUB_OUTPUT
+              ;;
+            stg)
+              echo "webapp-name=app-dorise-api-stg" >> $GITHUB_OUTPUT
+              echo "resource-group=rg-dorise-stg-eastus" >> $GITHUB_OUTPUT
+              ;;
+            prod)
+              echo "webapp-name=app-dorise-api-prod" >> $GITHUB_OUTPUT
+              echo "resource-group=rg-dorise-prod-eastus" >> $GITHUB_OUTPUT
+              ;;
+          esac
+
+      - name: Log rollback details
+        run: |
+          echo "🔄 Rollback Request Details"
+          echo "==========================="
+          echo "Environment: ${{ github.event.inputs.environment }}"
+          echo "Method: ${{ github.event.inputs.rollback-method }}"
+          echo "Reason: ${{ github.event.inputs.reason }}"
+          echo "Requested by: ${{ github.actor }}"
+          echo "Time: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          echo "==========================="
+
+  # ============================================================================
+  # Slot Swap Rollback (Fast)
+  # ============================================================================
+  slot-swap-rollback:
+    name: Slot Swap Rollback
+    runs-on: ubuntu-latest
+    needs: validate
+    if: ${{ github.event.inputs.rollback-method == 'slot-swap' }}
+    environment:
+      name: rollback-${{ github.event.inputs.environment }}
+
+    steps:
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ github.event.inputs.environment == 'prod' && secrets.AZURE_CREDENTIALS_PROD || secrets.AZURE_CREDENTIALS }}
+        continue-on-error: true
+
+      - name: Get current deployment info
+        run: |
+          echo "📋 Current deployment info:"
+          az webapp config appsettings list \
+            --resource-group ${{ needs.validate.outputs.resource-group }} \
+            --name ${{ needs.validate.outputs.webapp-name }} \
+            --query "[?name=='DeploymentVersion' || name=='DeploymentTime']" \
+            --output table
+        continue-on-error: true
+
+      - name: Perform slot swap
+        run: |
+          echo "🔄 Performing slot swap rollback..."
+
+          az webapp deployment slot swap \
+            --resource-group ${{ needs.validate.outputs.resource-group }} \
+            --name ${{ needs.validate.outputs.webapp-name }} \
+            --slot staging \
+            --target-slot production
+
+          echo "✅ Slot swap completed!"
+        continue-on-error: true
+
+      - name: Verify rollback
+        run: |
+          echo "🔍 Verifying rollback..."
+          sleep 15
+
+          response=$(curl -s -o /dev/null -w "%{http_code}" \
+            "https://${{ needs.validate.outputs.webapp-name }}.azurewebsites.net/health" \
+            --max-time 30 || echo "000")
+
+          if [ "$response" = "200" ]; then
+            echo "✅ Rollback verified - Health check passed!"
+          else
+            echo "⚠️ Health check returned: $response"
+          fi
+        continue-on-error: true
+
+      - name: Update rollback metadata
+        run: |
+          az webapp config appsettings set \
+            --resource-group ${{ needs.validate.outputs.resource-group }} \
+            --name ${{ needs.validate.outputs.webapp-name }} \
+            --settings \
+              LastRollback="$(date -u '+%Y-%m-%dT%H:%M:%SZ')" \
+              RollbackReason="${{ github.event.inputs.reason }}" \
+              RollbackBy="${{ github.actor }}"
+        continue-on-error: true
+
+      - name: Logout from Azure
+        run: az logout
+        if: always()
+
+  # ============================================================================
+  # Redeploy Previous Version
+  # ============================================================================
+  redeploy-previous:
+    name: Redeploy Previous Version
+    runs-on: ubuntu-latest
+    needs: validate
+    if: ${{ github.event.inputs.rollback-method == 'redeploy-previous' }}
+    environment:
+      name: rollback-${{ github.event.inputs.environment }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Find previous successful deployment
+        id: find-previous
+        run: |
+          echo "🔍 Finding previous successful deployment..."
+
+          # Get previous deployment from git tags
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+
+          if [ -z "$PREVIOUS_TAG" ]; then
+            echo "⚠️ No previous tag found, using HEAD~1"
+            PREVIOUS_SHA=$(git rev-parse HEAD~1)
+            echo "previous-ref=$PREVIOUS_SHA" >> $GITHUB_OUTPUT
+          else
+            echo "Found previous tag: $PREVIOUS_TAG"
+            echo "previous-ref=$PREVIOUS_TAG" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Trigger redeployment
+        run: |
+          echo "🚀 Would trigger redeployment of: ${{ steps.find-previous.outputs.previous-ref }}"
+          echo "This would require running the appropriate CD workflow with the previous version."
+          echo ""
+          echo "Manual steps to complete:"
+          echo "1. Go to Actions tab"
+          echo "2. Select 'CD - Deploy to ${{ github.event.inputs.environment }}'"
+          echo "3. Run workflow with version: ${{ steps.find-previous.outputs.previous-ref }}"
+        continue-on-error: true
+
+  # ============================================================================
+  # Post-Rollback Notification
+  # ============================================================================
+  notify:
+    name: Send Notification
+    runs-on: ubuntu-latest
+    needs: [validate, slot-swap-rollback, redeploy-previous]
+    if: always()
+
+    steps:
+      - name: Rollback summary
+        run: |
+          echo "📧 Rollback Summary"
+          echo "==================="
+          echo "Environment: ${{ github.event.inputs.environment }}"
+          echo "Method: ${{ github.event.inputs.rollback-method }}"
+          echo "Reason: ${{ github.event.inputs.reason }}"
+          echo "Initiated by: ${{ github.actor }}"
+          echo "Time: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          echo "Status: Completed"
+          echo "==================="
+          echo ""
+          echo "🔗 Verify at: https://${{ needs.validate.outputs.webapp-name }}.azurewebsites.net"

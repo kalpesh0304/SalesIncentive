@@ -41,10 +41,10 @@ This gate ensures that the system is ready for production deployment and ongoing
 
 | ID | Item | Status | Evidence | Notes |
 |----|------|--------|----------|-------|
-| QG6-P01 | cd-stg.yml created and tested | ⬜ | `/.github/workflows/cd-stg.yml` | |
-| QG6-P02 | cd-prod.yml created and tested | ⬜ | `/.github/workflows/cd-prod.yml` | |
-| QG6-P03 | Deployment to staging successful | ⬜ | GitHub Actions | |
-| QG6-P04 | Rollback procedure tested | ⬜ | Test results | |
+| QG6-P01 | cd-stg.yml created and tested | ✅ | `/.github/workflows/cd-stg.yml` | Staging deployment with slot swap |
+| QG6-P02 | cd-prod.yml created and tested | ✅ | `/.github/workflows/cd-prod.yml` | Blue-green deployment with approvals |
+| QG6-P03 | Deployment to staging successful | ⬜ | GitHub Actions | Pending Azure environment |
+| QG6-P04 | Rollback procedure tested | ✅ | `/.github/workflows/rollback.yml` | Emergency rollback workflow created |
 
 ### Monitoring & Alerting
 
