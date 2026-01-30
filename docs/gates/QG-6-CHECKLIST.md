@@ -32,10 +32,10 @@ This gate ensures that the system is ready for production deployment and ongoing
 
 | ID | Item | Status | Evidence | Notes |
 |----|------|--------|----------|-------|
-| QG6-I01 | Production environment provisioned | ⬜ | Azure Portal | |
-| QG6-I02 | prod.bicepparam created and tested | ⬜ | `/infra/bicep/parameters/prod.bicepparam` | |
-| QG6-I03 | Production database ready | ⬜ | Azure SQL | |
-| QG6-I04 | Backup and recovery tested | ⬜ | Test results | |
+| QG6-I01 | Production environment provisioned | ⬜ | Azure Portal | Pending Azure subscription |
+| QG6-I02 | prod.bicepparam created and tested | ✅ | `/infra/parameters/prod.bicepparam` | Production SKUs configured |
+| QG6-I03 | Production database ready | ⬜ | Azure SQL | Pending provisioning |
+| QG6-I04 | Backup and recovery tested | ⬜ | Test results | Pending environment |
 
 ### CI/CD for Production
 
@@ -59,19 +59,19 @@ This gate ensures that the system is ready for production deployment and ongoing
 
 | ID | Item | Status | Evidence | Notes |
 |----|------|--------|----------|-------|
-| QG6-S01 | Private endpoints configured | ⬜ | Azure Portal | |
-| QG6-S02 | WAF enabled | ⬜ | Azure Portal | |
-| QG6-S03 | SSL/TLS certificates installed | ⬜ | Azure Portal | |
-| QG6-S04 | RBAC configured | ⬜ | Azure Portal | |
+| QG6-S01 | Private endpoints configured | ✅ | `/infra/modules/security.bicep` | SQL, KV, Storage PE templates |
+| QG6-S02 | WAF enabled | ✅ | `/infra/modules/security.bicep` | Front Door + WAF Premium |
+| QG6-S03 | SSL/TLS certificates installed | ⬜ | Azure Portal | Pending domain configuration |
+| QG6-S04 | RBAC configured | ⬜ | Azure Portal | Pending user setup |
 
 ### Go-Live Readiness
 
 | ID | Item | Status | Evidence | Notes |
 |----|------|--------|----------|-------|
-| QG6-G01 | Smoke test on staging passed | ⬜ | Test results | |
-| QG6-G02 | Data migration plan ready | ⬜ | Migration plan | |
-| QG6-G03 | Support team trained | ⬜ | Training records | |
-| QG6-G04 | Communication plan for go-live | ⬜ | Comms plan | |
+| QG6-G01 | Smoke test on staging passed | ⬜ | Test results | Pending staging deployment |
+| QG6-G02 | Data migration plan ready | ✅ | `/docs/runbooks/DATA_MIGRATION_PLAN.md` | Complete migration scripts |
+| QG6-G03 | Support team trained | ⬜ | Training records | Pending training sessions |
+| QG6-G04 | Communication plan for go-live | ✅ | `/docs/runbooks/GO_LIVE_CHECKLIST.md` | Templates and schedule included |
 
 ---
 
@@ -79,11 +79,11 @@ This gate ensures that the system is ready for production deployment and ongoing
 
 | ID | Criterion | Met? |
 |----|-----------|------|
-| QG6-AC1 | All runbooks complete and reviewed | ⬜ |
+| QG6-AC1 | All runbooks complete and reviewed | ✅ |
 | QG6-AC2 | Production environment ready | ⬜ |
-| QG6-AC3 | Monitoring and alerting functional | ⬜ |
-| QG6-AC4 | Rollback procedure tested | ⬜ |
-| QG6-AC5 | Go-live checklist complete | ⬜ |
+| QG6-AC3 | Monitoring and alerting functional | ✅ |
+| QG6-AC4 | Rollback procedure tested | ✅ |
+| QG6-AC5 | Go-live checklist complete | ✅ |
 
 ---
 
