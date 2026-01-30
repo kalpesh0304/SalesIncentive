@@ -1,4 +1,5 @@
 using Dorise.Incentive.Application;
+using Dorise.Incentive.Api.Documentation;
 using Dorise.Incentive.Infrastructure;
 using Serilog;
 
@@ -19,15 +20,10 @@ builder.Services.AddInfrastructureServices(builder.Configuration);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new()
-    {
-        Title = "Dorise Incentive API",
-        Version = "v1",
-        Description = "Sales Incentive Management System API - 'I'm learnding!' - Ralph Wiggum"
-    });
-});
+
+// Add API versioning and documentation
+builder.Services.AddApiVersioningServices();
+builder.Services.AddSwaggerDocumentation();
 
 builder.Services.AddHealthChecks();
 
@@ -36,8 +32,7 @@ var app = builder.Build();
 // Configure pipeline
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerDocumentation();
 }
 
 app.UseHttpsRedirection();
