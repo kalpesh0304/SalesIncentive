@@ -128,7 +128,6 @@ jobs:
 
       - name: Install Bicep CLI
         run: |
-          az bicep install
           az bicep version
 
       - name: Validate Bicep templates
