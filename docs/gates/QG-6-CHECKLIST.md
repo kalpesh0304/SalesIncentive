@@ -50,10 +50,10 @@ This gate ensures that the system is ready for production deployment and ongoing
 
 | ID | Item | Status | Evidence | Notes |
 |----|------|--------|----------|-------|
-| QG6-M01 | Application Insights configured | ⬜ | Azure Portal | |
-| QG6-M02 | Log Analytics configured | ⬜ | Azure Portal | |
-| QG6-M03 | Alerts configured for critical metrics | ⬜ | Azure Portal | |
-| QG6-M04 | Dashboard created | ⬜ | Azure Portal | |
+| QG6-M01 | Application Insights configured | ✅ | `/infra/modules/monitoring.bicep` | App Insights + Log Analytics |
+| QG6-M02 | Log Analytics configured | ✅ | `/infra/monitoring/log-analytics-queries.kql` | Saved queries for all scenarios |
+| QG6-M03 | Alerts configured for critical metrics | ✅ | `/infra/modules/alerts.bicep` | CPU, memory, errors, health, DB |
+| QG6-M04 | Dashboard created | ✅ | `/infra/modules/dashboard.bicep` | Overview dashboard template |
 
 ### Security & Compliance
 
