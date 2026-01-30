@@ -1,6 +1,7 @@
 using Dorise.Incentive.Application.Audit.Services;
 using Dorise.Incentive.Application.Common.Interfaces;
 using Dorise.Incentive.Application.Configuration.Services;
+using Dorise.Incentive.Application.DataTransfer.Services;
 using Dorise.Incentive.Application.Jobs.Services;
 using Dorise.Incentive.Application.Dashboard.Services;
 using Dorise.Incentive.Application.Integrations.Services;
@@ -11,6 +12,7 @@ using Dorise.Incentive.Domain.Interfaces;
 using Dorise.Incentive.Infrastructure.Audit;
 using Dorise.Incentive.Infrastructure.Configuration;
 using Dorise.Incentive.Infrastructure.Dashboard;
+using Dorise.Incentive.Infrastructure.DataTransfer;
 using Dorise.Incentive.Infrastructure.Integrations;
 using Dorise.Incentive.Infrastructure.Jobs;
 using Dorise.Incentive.Infrastructure.Notifications;
@@ -124,6 +126,17 @@ public static class DependencyInjection
         services.AddScoped<IJobService, JobService>();
         services.AddScoped<IJobScheduleService, JobScheduleService>();
         services.AddScoped<IBatchOperationService, BatchOperationService>();
+
+        // Data Transfer Services
+        services.AddScoped<IDataImportRepository, DataImportRepository>();
+        services.AddScoped<IDataExportRepository, DataExportRepository>();
+        services.AddScoped<IDataTransferTemplateRepository, DataTransferTemplateRepository>();
+        services.AddScoped<IImportFieldMappingRepository, ImportFieldMappingRepository>();
+        services.AddScoped<IDataImportService, DataImportService>();
+        services.AddScoped<IDataExportService, DataExportService>();
+        services.AddScoped<IDataTransferTemplateService, DataTransferTemplateService>();
+        services.AddScoped<IFileParserService, FileParserService>();
+        services.AddScoped<IDataTransferStatisticsService, DataTransferStatisticsService>();
 
         return services;
     }

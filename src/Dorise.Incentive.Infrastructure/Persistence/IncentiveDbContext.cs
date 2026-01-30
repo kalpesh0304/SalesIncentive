@@ -37,6 +37,10 @@ public class IncentiveDbContext : DbContext
     public DbSet<CalculationParameter> CalculationParameters => Set<CalculationParameter>();
     public DbSet<BackgroundJob> BackgroundJobs => Set<BackgroundJob>();
     public DbSet<JobSchedule> JobSchedules => Set<JobSchedule>();
+    public DbSet<DataImport> DataImports => Set<DataImport>();
+    public DbSet<DataExport> DataExports => Set<DataExport>();
+    public DbSet<DataTransferTemplate> DataTransferTemplates => Set<DataTransferTemplate>();
+    public DbSet<ImportFieldMapping> ImportFieldMappings => Set<ImportFieldMapping>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
