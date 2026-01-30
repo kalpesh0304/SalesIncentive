@@ -65,8 +65,10 @@ public static class DependencyInjection
         services.AddScoped<IApprovalRepository, ApprovalRepository>();
         services.AddScoped<IAuditLogRepository, AuditLogRepository>();
         services.AddScoped<IRoleRepository, RoleRepository>();
+        services.AddScoped<IUserRoleRepository, UserRoleRepository>();
         services.AddScoped<IBackgroundJobRepository, BackgroundJobRepository>();
         services.AddScoped<IPlanAssignmentRepository, PlanAssignmentRepository>();
+        services.AddScoped<IEmailTemplateRepository, EmailTemplateRepository>();
 
         // Read-Only Repository Aggregator (for query handlers)
         services.AddScoped<IReadOnlyRepository, ReadOnlyRepository>();
