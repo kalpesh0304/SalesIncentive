@@ -118,16 +118,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Azure CLI
-        uses: azure/cli@v2
-        with:
-          azcliversion: latest
-          inlineScript: |
-            echo "Azure CLI version:"
-            az version
-
       - name: Install Bicep CLI
         run: |
+          # Azure CLI is pre-installed on GitHub runners
+          az version
           az bicep install
           az bicep version
 
