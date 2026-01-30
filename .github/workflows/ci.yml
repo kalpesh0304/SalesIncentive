@@ -119,10 +119,17 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Azure CLI
-        uses: azure/cli@v1
+        uses: azure/cli@v2
         with:
+          azcliversion: latest
           inlineScript: |
-            az bicep version
+            echo "Azure CLI version:"
+            az version
+
+      - name: Install Bicep CLI
+        run: |
+          az bicep install
+          az bicep version
 
       - name: Validate Bicep templates
         run: |
