@@ -67,12 +67,21 @@ jobs:
         run: dotnet publish src/Dorise.Incentive.Api/Dorise.Incentive.Api.csproj --configuration Release --output ./publish --no-build
         continue-on-error: true
 
+      - name: Create placeholder if publish folder is empty
+        run: |
+          mkdir -p ./publish
+          if [ -z "$(ls -A ./publish 2>/dev/null)" ]; then
+            echo "No build output found - creating placeholder"
+            echo '{"status":"placeholder","message":"No build output - source code not yet implemented"}' > ./publish/placeholder.json
+          fi
+
       - name: Upload deployment package
         uses: actions/upload-artifact@v4
         with:
           name: webapp-package
           path: ./publish
           retention-days: 1
+          if-no-files-found: warn
 
   # ============================================================================
   # Deploy to Development

@@ -169,6 +169,14 @@ jobs:
             -p:Version=${{ needs.pre-deploy-checks.outputs.version }}
         continue-on-error: true
 
+      - name: Create placeholder if publish folder is empty
+        run: |
+          mkdir -p ./publish
+          if [ -z "$(ls -A ./publish 2>/dev/null)" ]; then
+            echo "No build output found - creating placeholder"
+            echo '{"status":"placeholder","message":"No build output - source code not yet implemented"}' > ./publish/placeholder.json
+          fi
+
       - name: Generate deployment manifest
         run: |
           cat > ./publish/deployment-manifest.json << EOF
@@ -188,6 +196,7 @@ jobs:
           name: webapp-package-prod
           path: ./publish
           retention-days: 30
+          if-no-files-found: warn
 
   # ============================================================================
   # Deploy to Production Staging Slot (Blue-Green)
