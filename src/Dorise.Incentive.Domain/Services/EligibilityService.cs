@@ -68,7 +68,8 @@ public class EligibilityService : IEligibilityService
 
     public bool MeetsTenureRequirement(Employee employee, IncentivePlan plan, DateTime asOfDate)
     {
-        var minTenureDays = plan.MinimumTenureDays ?? DefaultMinTenureDays;
+        // MinimumTenureDays could be parsed from EligibilityCriteria in future
+        var minTenureDays = DefaultMinTenureDays;
         var tenureDays = employee.GetTenureInDays(asOfDate);
         return tenureDays >= minTenureDays;
     }
@@ -148,7 +149,8 @@ public class EligibilityService : IEligibilityService
 
     private EligibilityCriterion CheckTenureCriterion(Employee employee, IncentivePlan plan, DateTime asOfDate)
     {
-        var minTenureDays = plan.MinimumTenureDays ?? DefaultMinTenureDays;
+        // MinimumTenureDays could be parsed from EligibilityCriteria in future
+        var minTenureDays = DefaultMinTenureDays;
         var tenureDays = employee.GetTenureInDays(asOfDate);
         var meetsTenure = tenureDays >= minTenureDays;
 

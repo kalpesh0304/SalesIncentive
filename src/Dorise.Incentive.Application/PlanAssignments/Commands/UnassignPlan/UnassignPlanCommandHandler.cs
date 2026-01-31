@@ -34,14 +34,16 @@ public class UnassignPlanCommandHandler : ICommandHandler<UnassignPlanCommand>
             return Result.Failure("Assignment is already ended", "ALREADY_ENDED");
         }
 
-        if (request.EffectiveDate < assignment.EffectiveFrom)
+        if (request.EffectiveDate < assignment.EffectivePeriod.StartDate)
         {
             return Result.Failure(
                 "End date cannot be before assignment start date",
                 "INVALID_END_DATE");
         }
 
-        assignment.End(request.EffectiveDate);
+        // Update the effective period to end on the requested date
+        assignment.UpdatePeriod(assignment.EffectivePeriod.StartDate, request.EffectiveDate);
+        assignment.Deactivate();
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 

@@ -85,7 +85,7 @@ public class ActivateIncentivePlanCommandHandler : ICommandHandler<ActivateIncen
             var orderedSlabs = plan.Slabs.OrderBy(s => s.Order).ToList();
 
             // Check first slab starts at minimum threshold or 0
-            if (orderedSlabs[0].FromPercentage.Value > plan.Target.MinimumThreshold)
+            if (orderedSlabs[0].FromPercentage > plan.Target.MinimumThreshold)
             {
                 errors.Add($"First slab should start at or below minimum threshold ({plan.Target.MinimumThreshold}%)");
             }

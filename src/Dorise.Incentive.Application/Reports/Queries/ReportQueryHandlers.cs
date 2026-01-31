@@ -31,14 +31,14 @@ public class GetPayoutReportQueryHandler : IQueryHandler<GetPayoutReportQuery, P
         var calculations = await _unitOfWork.Calculations.GetByPeriodAsync(
             request.PeriodStart,
             request.PeriodEnd,
-            cancellationToken);
+            cancellationToken: cancellationToken);
 
         // Filter by department if specified
         if (request.DepartmentId.HasValue)
         {
             var employeeIds = (await _unitOfWork.Employees.GetByDepartmentAsync(
                 request.DepartmentId.Value,
-                cancellationToken)).Select(e => e.Id).ToHashSet();
+                cancellationToken: cancellationToken)).Select(e => e.Id).ToHashSet();
 
             calculations = calculations.Where(c => employeeIds.Contains(c.EmployeeId)).ToList();
         }
@@ -146,14 +146,14 @@ public class GetAchievementSummaryQueryHandler : IQueryHandler<GetAchievementSum
         var calculations = await _unitOfWork.Calculations.GetByPeriodAsync(
             request.PeriodStart,
             request.PeriodEnd,
-            cancellationToken);
+            cancellationToken: cancellationToken);
 
         // Filter by department if specified
         if (request.DepartmentId.HasValue)
         {
             var employeeIds = (await _unitOfWork.Employees.GetByDepartmentAsync(
                 request.DepartmentId.Value,
-                cancellationToken)).Select(e => e.Id).ToHashSet();
+                cancellationToken: cancellationToken)).Select(e => e.Id).ToHashSet();
 
             calculations = calculations.Where(c => employeeIds.Contains(c.EmployeeId)).ToList();
         }
@@ -304,19 +304,19 @@ public class GetVarianceAnalysisQueryHandler : IQueryHandler<GetVarianceAnalysis
         var currentCalcs = await _unitOfWork.Calculations.GetByPeriodAsync(
             request.CurrentPeriodStart,
             request.CurrentPeriodEnd,
-            cancellationToken);
+            cancellationToken: cancellationToken);
 
         var previousCalcs = await _unitOfWork.Calculations.GetByPeriodAsync(
             request.PreviousPeriodStart,
             request.PreviousPeriodEnd,
-            cancellationToken);
+            cancellationToken: cancellationToken);
 
         // Filter by department if specified
         if (request.DepartmentId.HasValue)
         {
             var employeeIds = (await _unitOfWork.Employees.GetByDepartmentAsync(
                 request.DepartmentId.Value,
-                cancellationToken)).Select(e => e.Id).ToHashSet();
+                cancellationToken: cancellationToken)).Select(e => e.Id).ToHashSet();
 
             currentCalcs = currentCalcs.Where(c => employeeIds.Contains(c.EmployeeId)).ToList();
             previousCalcs = previousCalcs.Where(c => employeeIds.Contains(c.EmployeeId)).ToList();
@@ -486,13 +486,13 @@ public class GetDashboardQueryHandler : IQueryHandler<GetDashboardQuery, Dashboa
         var currentMonthCalcs = await _unitOfWork.Calculations.GetByPeriodAsync(
             currentMonthStart,
             currentMonthEnd,
-            cancellationToken);
+            cancellationToken: cancellationToken);
 
         // Get YTD calculations
         var ytdCalcs = await _unitOfWork.Calculations.GetByPeriodAsync(
             yearStart,
             now,
-            cancellationToken);
+            cancellationToken: cancellationToken);
 
         // Get all employees
         var allEmployees = await _unitOfWork.Employees.GetAllActiveAsync(cancellationToken);
@@ -526,7 +526,7 @@ public class GetDashboardQueryHandler : IQueryHandler<GetDashboardQuery, Dashboa
             var monthCalcs = await _unitOfWork.Calculations.GetByPeriodAsync(
                 monthStart,
                 monthEnd,
-                cancellationToken);
+                cancellationToken: cancellationToken);
 
             monthlyTrend.Add(new MonthlyTrendDto
             {

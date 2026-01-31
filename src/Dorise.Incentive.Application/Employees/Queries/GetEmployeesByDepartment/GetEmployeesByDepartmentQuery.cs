@@ -28,7 +28,7 @@ public class GetEmployeesByDepartmentQueryHandler : IRequestHandler<GetEmployees
         GetEmployeesByDepartmentQuery request,
         CancellationToken cancellationToken)
     {
-        var employees = await _repository.Employees.GetByDepartmentAsync(request.DepartmentId, cancellationToken);
+        var employees = await _repository.Employees.GetByDepartmentAsync(request.DepartmentId, cancellationToken: cancellationToken);
         return _mapper.Map<IReadOnlyList<EmployeeSummaryDto>>(employees);
     }
 }

@@ -1,9 +1,23 @@
+using Azure.Identity;
 using Dorise.Incentive.Application;
 using Dorise.Incentive.Api.Documentation;
 using Dorise.Incentive.Infrastructure;
+using Dorise.Incentive.Infrastructure.Security;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Identity.Web;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Add Azure Key Vault configuration provider
+var keyVaultUri = builder.Configuration["KeyVault:VaultUri"];
+if (!string.IsNullOrEmpty(keyVaultUri))
+{
+    builder.Configuration.AddAzureKeyVault(
+        new Uri(keyVaultUri),
+        new DefaultAzureCredential());
+}
 
 // Configure Serilog
 Log.Logger = new LoggerConfiguration()
@@ -27,6 +41,16 @@ builder.Services.AddSwaggerDocumentation();
 
 builder.Services.AddHealthChecks();
 
+// Add Authentication with Azure AD / JWT Bearer
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+
+// Add Authorization with custom permission-based policy provider
+builder.Services.AddAuthorization();
+builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
+builder.Services.AddScoped<IAuthorizationHandler, ExtendedPermissionAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, AnyPermissionAuthorizationHandler>();
+
 var app = builder.Build();
 
 // Configure pipeline
@@ -37,6 +61,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseSerilogRequestLogging();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.MapHealthChecks("/health");

@@ -56,7 +56,7 @@ public class MappingProfile : Profile
         CreateMap<IncentivePlan, IncentivePlanSummaryDto>()
             .ForMember(d => d.EffectiveFrom, opt => opt.MapFrom(s => s.EffectivePeriod.StartDate))
             .ForMember(d => d.EffectiveTo, opt => opt.MapFrom(s => s.EffectivePeriod.EndDate))
-            .ForMember(d => d.AssignedEmployeesCount, opt => opt.MapFrom(s => s.Assignments.Count));
+            .ForMember(d => d.AssignmentCount, opt => opt.MapFrom(s => s.Assignments.Count));
 
         CreateMap<Slab, SlabDto>();
 

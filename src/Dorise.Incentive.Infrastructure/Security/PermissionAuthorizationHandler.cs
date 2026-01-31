@@ -1,7 +1,7 @@
-using Dorise.Incentive.Application.Security.Services;
 using Dorise.Incentive.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
+using IAppAuthorizationService = Dorise.Incentive.Application.Security.Services.IAuthorizationService;
 
 namespace Dorise.Incentive.Infrastructure.Security;
 
@@ -51,11 +51,11 @@ public class AnyPermissionRequirement : IAuthorizationRequirement
 /// </summary>
 public class PermissionAuthorizationHandler : AuthorizationHandler<PermissionRequirement>
 {
-    private readonly IAuthorizationService _authorizationService;
+    private readonly IAppAuthorizationService _authorizationService;
     private readonly ILogger<PermissionAuthorizationHandler> _logger;
 
     public PermissionAuthorizationHandler(
-        IAuthorizationService authorizationService,
+        IAppAuthorizationService authorizationService,
         ILogger<PermissionAuthorizationHandler> logger)
     {
         _authorizationService = authorizationService;
@@ -104,11 +104,11 @@ public class PermissionAuthorizationHandler : AuthorizationHandler<PermissionReq
 /// </summary>
 public class ExtendedPermissionAuthorizationHandler : AuthorizationHandler<ExtendedPermissionRequirement>
 {
-    private readonly IAuthorizationService _authorizationService;
+    private readonly IAppAuthorizationService _authorizationService;
     private readonly ILogger<ExtendedPermissionAuthorizationHandler> _logger;
 
     public ExtendedPermissionAuthorizationHandler(
-        IAuthorizationService authorizationService,
+        IAppAuthorizationService authorizationService,
         ILogger<ExtendedPermissionAuthorizationHandler> logger)
     {
         _authorizationService = authorizationService;
@@ -157,11 +157,11 @@ public class ExtendedPermissionAuthorizationHandler : AuthorizationHandler<Exten
 /// </summary>
 public class AnyPermissionAuthorizationHandler : AuthorizationHandler<AnyPermissionRequirement>
 {
-    private readonly IAuthorizationService _authorizationService;
+    private readonly IAppAuthorizationService _authorizationService;
     private readonly ILogger<AnyPermissionAuthorizationHandler> _logger;
 
     public AnyPermissionAuthorizationHandler(
-        IAuthorizationService authorizationService,
+        IAppAuthorizationService authorizationService,
         ILogger<AnyPermissionAuthorizationHandler> logger)
     {
         _authorizationService = authorizationService;

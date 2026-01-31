@@ -127,4 +127,33 @@ public class EmployeeRepository : AggregateRepositoryBase<Employee>, IEmployeeRe
             .ThenBy(e => e.LastName)
             .ToListAsync(cancellationToken);
     }
+
+    public async Task<IReadOnlyList<Employee>> GetByIdsAsync(
+        IEnumerable<Guid> ids,
+        CancellationToken cancellationToken = default)
+    {
+        var idList = ids.ToList();
+        return await DbSet
+            .Where(e => idList.Contains(e.Id))
+            .OrderBy(e => e.FirstName)
+            .ThenBy(e => e.LastName)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<Employee>> GetActiveAsync(CancellationToken cancellationToken = default)
+    {
+        return await GetAllActiveAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<Employee>> GetByCodesAsync(
+        IEnumerable<string> codes,
+        CancellationToken cancellationToken = default)
+    {
+        var codeList = codes.Select(c => c.Trim().ToUpperInvariant()).ToList();
+        return await DbSet
+            .Where(e => codeList.Contains(EF.Property<string>(e.EmployeeCode, "Value")))
+            .OrderBy(e => e.FirstName)
+            .ThenBy(e => e.LastName)
+            .ToListAsync(cancellationToken);
+    }
 }

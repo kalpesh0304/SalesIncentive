@@ -44,37 +44,31 @@ public class CreateIncentivePlanCommandHandler : ICommandHandler<CreateIncentive
         var plan = IncentivePlan.Create(
             request.Code,
             request.Name,
-            request.Description,
             request.PlanType,
             request.Frequency,
-            DateRange.Create(request.EffectiveFrom, request.EffectiveTo),
-            Target.Create(
-                request.TargetValue,
-                request.MinimumThreshold,
-                request.AchievementType,
-                request.MetricUnit),
-            request.MaximumPayout.HasValue ? Money.Create(request.MaximumPayout.Value, request.Currency) : null,
-            request.MinimumPayout.HasValue ? Money.Create(request.MinimumPayout.Value, request.Currency) : null,
-            request.RequiresApproval,
-            request.ApprovalLevels,
-            request.MinimumTenureDays,
-            request.EligibilityCriteria);
+            request.EffectiveFrom,
+            request.EffectiveTo,
+            request.TargetValue,
+            request.MinimumThreshold,
+            request.AchievementType,
+            request.Description,
+            request.MetricUnit);
 
-        // Add slabs if provided
+        // Set payout limits
+        plan.SetPayoutLimits(request.MaximumPayout, request.MinimumPayout, request.Currency);
+
+        // Configure approval
+        plan.ConfigureApproval(request.RequiresApproval, request.ApprovalLevels);
+
+        // Add slabs if provided (only for slab-based plans)
         if (request.Slabs != null && request.Slabs.Count > 0)
         {
             foreach (var slabDto in request.Slabs.OrderBy(s => s.Order))
             {
-                var slab = Slab.Create(
-                    slabDto.Name,
-                    slabDto.Description,
-                    slabDto.Order,
-                    Percentage.Create(slabDto.FromPercentage),
-                    Percentage.Create(slabDto.ToPercentage),
-                    Percentage.Create(slabDto.PayoutPercentage),
-                    slabDto.FixedAmount.HasValue ? Money.Create(slabDto.FixedAmount.Value, request.Currency) : null);
-
-                plan.AddSlab(slab);
+                plan.AddSlab(
+                    slabDto.FromPercentage,
+                    slabDto.ToPercentage,
+                    slabDto.PayoutPercentage);
             }
         }
 

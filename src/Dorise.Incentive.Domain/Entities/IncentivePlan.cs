@@ -170,11 +170,77 @@ public class IncentivePlan : AuditableEntity, IAggregateRoot
     public bool IsEffective(DateTime date) =>
         Status == PlanStatus.Active && EffectivePeriod.Contains(date);
 
+    /// <summary>
+    /// Gets whether the plan is currently active.
+    /// </summary>
+    public bool IsActive => Status == PlanStatus.Active;
+
     public Slab? GetApplicableSlab(Percentage achievement)
     {
         return _slabs
             .OrderBy(s => s.Order)
             .FirstOrDefault(s => s.IsInRange(achievement));
+    }
+
+    /// <summary>
+    /// Updates the plan with new values. Only allowed for Draft plans.
+    /// </summary>
+    public void Update(
+        string name,
+        string? description,
+        DateRange effectivePeriod,
+        Target target,
+        Money? maximumPayout,
+        Money? minimumPayout,
+        bool requiresApproval,
+        int approvalLevels,
+        int? minimumTenureDays,
+        string? eligibilityCriteria)
+    {
+        EnsureModifiable();
+
+        Name = name.Trim();
+        Description = description?.Trim();
+        EffectivePeriod = effectivePeriod;
+        Target = target;
+        MaximumPayout = maximumPayout;
+        MinimumPayout = minimumPayout;
+        RequiresApproval = requiresApproval;
+        ApprovalLevels = requiresApproval ? approvalLevels : 0;
+        EligibilityCriteria = eligibilityCriteria?.Trim();
+    }
+
+    /// <summary>
+    /// Creates a copy of this plan with a new code and name.
+    /// </summary>
+    public IncentivePlan Clone(string newCode, string newName)
+    {
+        var cloned = Create(
+            newCode,
+            newName,
+            PlanType,
+            Frequency,
+            EffectivePeriod.StartDate,
+            EffectivePeriod.EndDate,
+            Target.TargetValue,
+            Target.MinimumThreshold,
+            Target.AchievementType,
+            Description,
+            Target.MetricUnit);
+
+        cloned.MaximumPayout = MaximumPayout;
+        cloned.MinimumPayout = MinimumPayout;
+        cloned.RequiresApproval = RequiresApproval;
+        cloned.ApprovalLevels = ApprovalLevels;
+        cloned.EligibilityCriteria = EligibilityCriteria;
+
+        // Clone slabs
+        foreach (var slab in _slabs.OrderBy(s => s.Order))
+        {
+            cloned.AddSlab(slab.FromPercentage, slab.ToPercentage, slab.PayoutRate);
+        }
+
+        return cloned;
     }
 
     private void EnsureModifiable()

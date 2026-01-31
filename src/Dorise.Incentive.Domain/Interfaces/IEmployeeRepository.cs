@@ -78,4 +78,23 @@ public interface IEmployeeRepository : IAggregateRepository<Employee>
     /// Gets all active employees.
     /// </summary>
     Task<IReadOnlyList<Employee>> GetAllActiveAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets employees by their IDs.
+    /// </summary>
+    Task<IReadOnlyList<Employee>> GetByIdsAsync(
+        IEnumerable<Guid> ids,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets active employees (alias for GetAllActiveAsync).
+    /// </summary>
+    Task<IReadOnlyList<Employee>> GetActiveAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets employees by their codes.
+    /// </summary>
+    Task<IReadOnlyList<Employee>> GetByCodesAsync(
+        IEnumerable<string> codes,
+        CancellationToken cancellationToken = default);
 }

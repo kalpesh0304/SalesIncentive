@@ -8,6 +8,9 @@
     <AssemblyName>Dorise.Incentive.Domain</AssemblyName>
   </PropertyGroup>
 
-  <!-- Domain layer has no external dependencies - pure C# -->
+  <ItemGroup>
+    <!-- MediatR.Contracts for INotification interface only -->
+    <PackageReference Include="MediatR.Contracts" Version="2.0.1" />
+  </ItemGroup>
 
 </Project>

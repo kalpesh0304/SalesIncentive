@@ -1,3 +1,4 @@
+using Dorise.Incentive.Application.Common.Interfaces;
 using Dorise.Incentive.Application.IncentivePlans.DTOs;
 using MediatR;
 

@@ -19,6 +19,7 @@ public class UnitOfWork : IUnitOfWork
     private IIncentivePlanRepository? _incentivePlans;
     private ICalculationRepository? _calculations;
     private IApprovalRepository? _approvals;
+    private IPlanAssignmentRepository? _planAssignments;
 
     public UnitOfWork(IncentiveDbContext context)
     {
@@ -39,6 +40,9 @@ public class UnitOfWork : IUnitOfWork
 
     public IApprovalRepository Approvals =>
         _approvals ??= new ApprovalRepository(_context);
+
+    public IPlanAssignmentRepository PlanAssignments =>
+        _planAssignments ??= new PlanAssignmentRepository(_context);
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

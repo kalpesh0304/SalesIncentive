@@ -1,4 +1,5 @@
 using Dorise.Incentive.Domain.Entities;
+using Dorise.Incentive.Domain.Enums;
 
 namespace Dorise.Incentive.Application.Dashboard.DTOs;
 
