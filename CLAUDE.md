@@ -335,6 +335,15 @@ fix(api): handle null assignments in calculation
 | JobSchedule | Missing DeleteAsync | Add DeleteAsync to interface + impl |
 | AuditLog | AuditAction enum values | Added `Access` and `Custom` |
 
+### Controller-Specific Error History
+| Controller | Errors Fixed | Pattern to Avoid |
+|------------|--------------|------------------|
+| DashboardController | Ambiguous DTOs (4 types) | Use type aliases for Reports.DTOs/Dashboard.DTOs |
+| CalculationsController | Duplicate RejectRequest | Prefix with `Calculation` context |
+| SecurityController | IAuthorizationService ambiguity | Use `IAppAuthorizationService` alias |
+| NotificationsController | Raw string literal concat | Use `$"""` interpolated raw strings |
+| IncentivePlansController | Wrong command namespace | SuspendPlan commands are in ActivatePlan folder |
+
 ### API Controller Patterns
 ```csharp
 // ❌ WRONG - Cannot concatenate raw string literals
@@ -360,6 +369,13 @@ using Dorise.Incentive.Application.Reports.DTOs;  // Both have DashboardDto!
 
 // ✅ RIGHT - Use type alias or remove conflicting using
 using DashboardDto = Dorise.Incentive.Application.Dashboard.DTOs.DashboardDto;
+
+// ✅ DashboardController pattern - multiple type aliases for cross-namespace DTOs
+using Dorise.Incentive.Application.Dashboard.DTOs;  // Primary namespace
+using DashboardKpisDto = Dorise.Incentive.Application.Reports.DTOs.DashboardKpisDto;
+using MonthlyTrendDto = Dorise.Incentive.Application.Reports.DTOs.MonthlyTrendDto;
+using PendingActionDto = Dorise.Incentive.Application.Reports.DTOs.PendingActionDto;
+using PeriodComparisonDto = Dorise.Incentive.Application.Dashboard.DTOs.PeriodComparisonDto;
 
 // ❌ WRONG - Duplicate record definition across controllers
 public record RejectRequest(string Reason);  // Also in ApprovalsController!
