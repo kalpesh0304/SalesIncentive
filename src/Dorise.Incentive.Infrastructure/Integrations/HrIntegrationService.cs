@@ -77,10 +77,11 @@ public class HrIntegrationService : IHrIntegrationService
         {
             cancellationToken.ThrowIfCancellationRequested();
 
+            Employee? existingEmployee = null;
             try
             {
-                var employeeCode = new EmployeeCode(hrEmployee.EmployeeCode);
-                var existingEmployee = await _employeeRepository.GetByCodeAsync(
+                var employeeCode = EmployeeCode.Create(hrEmployee.EmployeeCode);
+                existingEmployee = await _employeeRepository.GetByCodeAsync(
                     employeeCode, cancellationToken);
 
                 if (existingEmployee == null)
@@ -321,7 +322,7 @@ public class HrIntegrationService : IHrIntegrationService
         if (!string.IsNullOrWhiteSpace(hrEmployee.ManagerCode))
         {
             var manager = await _employeeRepository.GetByCodeAsync(
-                new EmployeeCode(hrEmployee.ManagerCode), cancellationToken);
+                EmployeeCode.Create(hrEmployee.ManagerCode), cancellationToken);
             managerId = manager?.Id;
         }
 
@@ -378,7 +379,7 @@ public class HrIntegrationService : IHrIntegrationService
                 if (!string.IsNullOrWhiteSpace(hrEmployee.ManagerCode))
                 {
                     var manager = await _employeeRepository.GetByCodeAsync(
-                        new EmployeeCode(hrEmployee.ManagerCode), cancellationToken);
+                        EmployeeCode.Create(hrEmployee.ManagerCode), cancellationToken);
                     managerId = manager?.Id;
                 }
 
@@ -391,7 +392,7 @@ public class HrIntegrationService : IHrIntegrationService
         if (!wasUpdated && !string.IsNullOrWhiteSpace(hrEmployee.ManagerCode))
         {
             var manager = await _employeeRepository.GetByCodeAsync(
-                new EmployeeCode(hrEmployee.ManagerCode), cancellationToken);
+                EmployeeCode.Create(hrEmployee.ManagerCode), cancellationToken);
 
             if (manager != null && employee.ManagerId != manager.Id)
             {
@@ -435,7 +436,7 @@ public class HrIntegrationService : IHrIntegrationService
             "probation" => EmployeeStatus.Probation,
             "inactive" => EmployeeStatus.Inactive,
             "terminated" or "resigned" or "left" => EmployeeStatus.Terminated,
-            "suspended" => EmployeeStatus.Suspended,
+            "suspended" => EmployeeStatus.OnLeave, // Suspended maps to OnLeave as closest equivalent
             _ => EmployeeStatus.Active
         };
     }

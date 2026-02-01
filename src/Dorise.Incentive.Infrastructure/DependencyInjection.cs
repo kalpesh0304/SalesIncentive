@@ -24,6 +24,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using IAppAuthorizationService = Dorise.Incentive.Application.Security.Services.IAuthorizationService;
 
 namespace Dorise.Incentive.Infrastructure;
 
@@ -110,7 +111,7 @@ public static class DependencyInjection
         services.AddSingleton<ICacheManagementService, CacheManagementService>();
 
         // Security & RBAC Services
-        services.AddScoped<IAuthorizationService, AuthorizationService>();
+        services.AddScoped<IAppAuthorizationService, AuthorizationService>();
         services.AddScoped<IRoleManagementService, RoleManagementService>();
         services.AddScoped<IUserRoleService, UserRoleService>();
         services.AddScoped<ISecurityAuditService, SecurityAuditService>();

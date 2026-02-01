@@ -284,7 +284,7 @@ public class DashboardService : IDashboardService
                     EmployeeName = calc != null && employeeNames.TryGetValue(calc.EmployeeId, out var name)
                         ? name
                         : "Unknown",
-                    Period = calc?.CalculationPeriod ?? period,
+                    Period = calc?.CalculationPeriod?.ToString() ?? period,
                     Amount = calc?.NetIncentive.Amount ?? 0,
                     SubmittedAt = a.CreatedAt,
                     HoursPending = hoursPending,
@@ -503,7 +503,7 @@ public class DashboardService : IDashboardService
                     Department = employee != null && deptDict.TryGetValue(employee.DepartmentId, out var dept)
                         ? dept
                         : null,
-                    Position = employee?.Position,
+                    Position = employee?.Designation,
                     AchievementPercentage = c.AchievementPercentage.Value,
                     IncentiveAmount = c.NetIncentive.Amount,
                     Rank = index + 1,
