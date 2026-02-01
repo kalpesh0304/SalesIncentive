@@ -5,6 +5,10 @@ using Dorise.Incentive.Application.Reports.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using DashboardKpisDto = Dorise.Incentive.Application.Reports.DTOs.DashboardKpisDto;
+using MonthlyTrendDto = Dorise.Incentive.Application.Reports.DTOs.MonthlyTrendDto;
+using PendingActionDto = Dorise.Incentive.Application.Reports.DTOs.PendingActionDto;
+using PeriodComparisonDto = Dorise.Incentive.Application.Dashboard.DTOs.PeriodComparisonDto;
 
 namespace Dorise.Incentive.Api.Controllers;
 
