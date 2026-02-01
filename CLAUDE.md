@@ -346,6 +346,32 @@ Body = $"""
     <p>Value: {variable}</p>
     </html>
     """
+
+// ❌ WRONG - Missing ApiVersion using directive
+[ApiVersion("1.0")]  // CS0246: 'ApiVersion' not found
+
+// ✅ RIGHT - Add Asp.Versioning using
+using Asp.Versioning;
+[ApiVersion("1.0")]
+
+// ❌ WRONG - Ambiguous type between namespaces
+using Dorise.Incentive.Application.Dashboard.DTOs;
+using Dorise.Incentive.Application.Reports.DTOs;  // Both have DashboardDto!
+
+// ✅ RIGHT - Use type alias or remove conflicting using
+using DashboardDto = Dorise.Incentive.Application.Dashboard.DTOs.DashboardDto;
+
+// ❌ WRONG - Duplicate record definition across controllers
+public record RejectRequest(string Reason);  // Also in ApprovalsController!
+
+// ✅ RIGHT - Prefix with controller context
+public record CalculationRejectRequest(string Reason);
+
+// ❌ WRONG - Missing PagedResult using
+[ProducesResponseType(typeof(PagedResult<Dto>), StatusCodes.Status200OK)]
+
+// ✅ RIGHT - Add Common.Interfaces using
+using Dorise.Incentive.Application.Common.Interfaces;
 ```
 
 ### Known Package Vulnerabilities (Monitor)
