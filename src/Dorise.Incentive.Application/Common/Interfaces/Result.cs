@@ -56,7 +56,7 @@ public class Result<T> : Result
         Value = value;
     }
 
-    public static new Result<T> Success(T value) => new(value, true, null, null);
+    public static Result<T> Success(T value) => new(value, true, null, null);
     public static new Result<T> Failure(string error, string? errorCode = null) => new(default, false, error, errorCode);
     public static new Result<T> NotFound(string entityName, object id) =>
         Failure($"{entityName} with ID '{id}' was not found.", "NOT_FOUND");

@@ -312,6 +312,51 @@ fix(api): handle null assignments in calculation
 
 ---
 
+## Entity Error Tracking (Build Status)
+
+### Layer Status
+| Layer | Status | Last Error | Fix Applied |
+|-------|--------|------------|-------------|
+| Domain | ✅ Clean | - | - |
+| Application | ✅ Clean | CS0109: 'new' keyword not required | Removed `new` from `Result<T>.Success()` |
+| Infrastructure | ✅ Clean | Missing DeleteAsync methods | Added to all repositories |
+| Api | ✅ Clean | CS9000: Raw string literal | Use `$"""` interpolated raw strings |
+
+### Entity-Specific Error History
+| Entity | Errors Fixed | Pattern to Avoid |
+|--------|--------------|------------------|
+| Employee | EmployeeCode constructor | Use `EmployeeCode.Create()` |
+| IncentivePlan | DateTime null comparison | `DateRange.EndDate` is non-nullable |
+| Calculation | decimal→double conversion | Cast to `(double)` for DTOs |
+| SystemConfiguration | Missing SearchAsync | Add to IConfigurationRepository |
+| FeatureFlag | Missing DeleteAsync | Add DeleteAsync to interface + impl |
+| EmailTemplate | Missing DeleteAsync | Add DeleteAsync to interface + impl |
+| CalculationParameter | Missing repository | Create full repository implementation |
+| JobSchedule | Missing DeleteAsync | Add DeleteAsync to interface + impl |
+| AuditLog | AuditAction enum values | Added `Access` and `Custom` |
+
+### API Controller Patterns
+```csharp
+// ❌ WRONG - Cannot concatenate raw string literals
+Body = """ ... """ + variable + """ ... """
+
+// ✅ RIGHT - Use interpolated raw string literal
+Body = $"""
+    <html>
+    <p>Value: {variable}</p>
+    </html>
+    """
+```
+
+### Known Package Vulnerabilities (Monitor)
+| Package | Version | Severity | Advisory |
+|---------|---------|----------|----------|
+| Azure.Identity | 1.10.4 | Moderate | GHSA-m5vv-6r4h-3vj9, GHSA-wvxc-855f-jvrv |
+
+**Action:** Update to latest Azure.Identity when available.
+
+---
+
 ## Code Review Checklist
 
 - [ ] `dotnet build` passes
@@ -321,6 +366,8 @@ fix(api): handle null assignments in calculation
 - [ ] New repositories properly registered
 - [ ] Logging uses structured format (not string interpolation)
 - [ ] No N+1 query issues (check Includes)
+- [ ] Raw string literals use `$"""` for interpolation (not concatenation)
+- [ ] Result pattern methods use correct `new` keyword placement
 
 ---
 

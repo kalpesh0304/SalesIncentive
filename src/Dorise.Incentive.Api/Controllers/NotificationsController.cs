@@ -383,13 +383,13 @@ public class NotificationsController : ControllerBase
         {
             To = request.To,
             Subject = "Test Email from Dorise Incentive System",
-            Body = """
+            Body = $"""
                 <html>
                 <body style="font-family: Arial, sans-serif; padding: 20px;">
                     <h2>Test Email</h2>
                     <p>This is a test email from the Dorise Incentive System.</p>
                     <p>If you received this email, your email configuration is working correctly.</p>
-                    <p>Sent at: """ + DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss UTC") + """</p>
+                    <p>Sent at: {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC</p>
                 </body>
                 </html>
                 """,
