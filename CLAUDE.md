@@ -101,6 +101,89 @@ assignment.EffectivePeriod.EndDate
 assignment.EffectivePeriod.Overlaps(otherPeriod)
 ```
 
+### Value Object Factory Methods
+```csharp
+// ❌ WRONG - Using constructor directly
+var code = new EmployeeCode("EMP001");
+
+// ✅ RIGHT - Use factory method
+var code = EmployeeCode.Create("EMP001");
+```
+
+### Type Conversions (Domain → DTO)
+```csharp
+// ❌ WRONG - Domain uses decimal, DTO expects double
+AverageAchievement = calculations.Average(c => c.AchievementPercentage.Value)
+
+// ✅ RIGHT - Explicit cast for percentage/metric DTOs
+AverageAchievement = (double)calculations.Average(c => c.AchievementPercentage.Value)
+```
+
+### DateTime Null Comparisons
+```csharp
+// ❌ WRONG - DateTime is non-nullable value type (always false)
+p.EffectivePeriod.EndDate == null || p.EffectivePeriod.EndDate >= date
+
+// ✅ RIGHT - DateRange.EndDate is non-nullable, remove null check
+p.EffectivePeriod.EndDate >= date
+```
+
+### Method Hiding in Derived Classes
+```csharp
+// ❌ WRONG - Compiler warning CS0108 (hides inherited member)
+public static Result<T> Failure(string error) => ...
+
+// ✅ RIGHT - Use 'new' keyword when intentionally hiding
+public static new Result<T> Failure(string error) => ...
+```
+
+### Repository DeleteAsync Pattern
+```csharp
+// ✅ Standard DeleteAsync implementation
+public Task DeleteAsync(Entity entity, CancellationToken cancellationToken = default)
+{
+    Remove(entity);  // Inherited from RepositoryBase
+    return Task.CompletedTask;
+}
+```
+
+---
+
+## Entity & Repository Reference
+
+### All Entities (16 Total)
+| Entity | File | Repository |
+|--------|------|------------|
+| Employee | `Domain/Entities/Employee.cs` | EmployeeRepository |
+| Department | `Domain/Entities/Department.cs` | DepartmentRepository |
+| IncentivePlan | `Domain/Entities/IncentivePlan.cs` | IncentivePlanRepository |
+| Slab | `Domain/Entities/Slab.cs` | (via IncentivePlan) |
+| PlanAssignment | `Domain/Entities/PlanAssignment.cs` | PlanAssignmentRepository |
+| Calculation | `Domain/Entities/Calculation.cs` | CalculationRepository |
+| Approval | `Domain/Entities/Approval.cs` | ApprovalRepository |
+| AuditLog | `Domain/Entities/AuditLog.cs` | AuditLogRepository |
+| BackgroundJob | `Domain/Entities/BackgroundJob.cs` | BackgroundJobRepository |
+| JobSchedule | `Domain/Entities/BackgroundJob.cs` | JobScheduleRepository |
+| DataTransfer | `Domain/Entities/DataTransfer.cs` | DataTransferRepository |
+| Role | `Domain/Entities/Role.cs` | RoleRepository |
+| SystemConfiguration | `Domain/Entities/SystemConfiguration.cs` | ConfigurationRepository |
+| FeatureFlag | `Domain/Entities/SystemConfiguration.cs` | FeatureFlagRepository |
+| EmailTemplate | `Domain/Entities/SystemConfiguration.cs` | EmailTemplateRepository |
+| CalculationParameter | `Domain/Entities/SystemConfiguration.cs` | CalculationParameterRepository |
+
+### Required Repository Methods
+Every repository interface should include these standard methods:
+```csharp
+public interface IFooRepository : IRepository<Foo>
+{
+    Task<Foo?> GetByIdAsync(Guid id, CancellationToken ct = default);
+    Task<IReadOnlyList<Foo>> GetAllAsync(CancellationToken ct = default);
+    Task AddAsync(Foo entity, CancellationToken ct = default);
+    Task DeleteAsync(Foo entity, CancellationToken ct = default);  // Don't forget!
+    Task<bool> ExistsAsync(string key, CancellationToken ct = default);
+}
+```
+
 ---
 
 ## Project Structure
@@ -251,6 +334,69 @@ fix(api): handle null assignments in calculation
 | Base Repository | `Infrastructure/Persistence/Repositories/RepositoryBase.cs` |
 | Base Entity | `Domain/Common/BaseEntity.cs` |
 | Result Type | `Application/Common/Interfaces/Result.cs` |
+
+---
+
+## DI Registration Checklist
+
+### Repositories (All Required)
+```csharp
+services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+services.AddScoped<IIncentivePlanRepository, IncentivePlanRepository>();
+services.AddScoped<ICalculationRepository, CalculationRepository>();
+services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+services.AddScoped<IApprovalRepository, ApprovalRepository>();
+services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+services.AddScoped<IRoleRepository, RoleRepository>();
+services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+services.AddScoped<IBackgroundJobRepository, BackgroundJobRepository>();
+services.AddScoped<IPlanAssignmentRepository, PlanAssignmentRepository>();
+services.AddScoped<IEmailTemplateRepository, EmailTemplateRepository>();
+services.AddScoped<ICalculationParameterRepository, CalculationParameterRepository>();
+services.AddScoped<IConfigurationRepository, ConfigurationRepository>();
+services.AddScoped<IFeatureFlagRepository, FeatureFlagRepository>();
+services.AddScoped<IJobScheduleRepository, JobScheduleRepository>();
+```
+
+### Services (All Required)
+```csharp
+// Configuration
+services.AddScoped<IConfigurationService, ConfigurationService>();
+services.AddScoped<IFeatureFlagService, FeatureFlagService>();
+services.AddScoped<IEmailTemplateService, EmailTemplateService>();
+
+// Jobs
+services.AddScoped<IJobService, JobService>();
+services.AddScoped<IJobScheduleService, JobScheduleService>();
+services.AddScoped<IBatchOperationService, BatchOperationService>();
+
+// Integration
+services.AddScoped<IErpIntegrationService, ErpIntegrationService>();
+services.AddScoped<IHrIntegrationService, HrIntegrationService>();
+services.AddScoped<IPayrollIntegrationService, PayrollIntegrationService>();
+
+// Dashboard & Reporting
+services.AddScoped<IDashboardService, DashboardService>();
+services.AddScoped<IReportGenerationService, ReportGenerationService>();
+
+// Security
+services.AddScoped<IAppAuthorizationService, AuthorizationService>();
+services.AddScoped<IRoleManagementService, RoleManagementService>();
+services.AddScoped<IUserRoleService, UserRoleService>();
+services.AddScoped<ISecurityAuditService, SecurityAuditService>();
+```
+
+---
+
+## Value Objects Quick Reference
+
+| Value Object | Properties | Factory Method |
+|--------------|------------|----------------|
+| `DateRange` | `.StartDate`, `.EndDate` | `DateRange.Create(start, end)` |
+| `Money` | `.Amount`, `.Currency` | `Money.Create(amount, currency)` |
+| `Percentage` | `.Value` | `Percentage.Create(value)` |
+| `EmployeeCode` | `.Value` | `EmployeeCode.Create(code)` |
+| `Target` | `.TargetValue`, `.MinimumThreshold` | `Target.Create(...)` |
 
 ---
 
