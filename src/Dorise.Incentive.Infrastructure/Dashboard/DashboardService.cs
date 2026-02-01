@@ -1,6 +1,7 @@
 using Dorise.Incentive.Application.Dashboard.DTOs;
 using Dorise.Incentive.Application.Dashboard.Services;
 using Dorise.Incentive.Domain.Entities;
+using Dorise.Incentive.Domain.Enums;
 using Dorise.Incentive.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
 

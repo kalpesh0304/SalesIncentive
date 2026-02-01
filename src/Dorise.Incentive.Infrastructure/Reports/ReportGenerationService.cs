@@ -1,6 +1,7 @@
 using Dorise.Incentive.Application.Reports.DTOs;
 using Dorise.Incentive.Application.Reports.Services;
 using Dorise.Incentive.Domain.Entities;
+using Dorise.Incentive.Domain.Enums;
 using Dorise.Incentive.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Text;
@@ -703,7 +704,7 @@ public class ReportGenerationService : IReportGenerationService
 
     private static AchievementBandDto CreateBand(string name, double min, double max, IReadOnlyList<Calculation> calculations)
     {
-        var count = calculations.Count(c => c.AchievementPercentage.Value >= min && c.AchievementPercentage.Value < max);
+        var count = calculations.Count(c => c.AchievementPercentage.Value >= (decimal)min && c.AchievementPercentage.Value < (decimal)max);
         return new AchievementBandDto
         {
             BandName = name,

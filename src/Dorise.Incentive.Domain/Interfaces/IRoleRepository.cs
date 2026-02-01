@@ -35,6 +35,11 @@ public interface IRoleRepository : IRepository<Role>
     /// Checks if a role name already exists.
     /// </summary>
     Task<bool> ExistsWithNameAsync(string name, Guid? excludeId = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Deletes a role asynchronously.
+    /// </summary>
+    Task DeleteAsync(Role role, CancellationToken cancellationToken = default);
 }
 
 /// <summary>

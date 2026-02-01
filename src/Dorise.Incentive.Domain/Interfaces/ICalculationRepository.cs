@@ -143,4 +143,12 @@ public interface ICalculationRepository : IAggregateRepository<Calculation>
         int page,
         int pageSize,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets calculations for a period string (e.g., "2025-01").
+    /// Converts period string to date range internally.
+    /// </summary>
+    Task<IReadOnlyList<Calculation>> GetByPeriodAsync(
+        string period,
+        CancellationToken cancellationToken = default);
 }

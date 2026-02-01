@@ -64,6 +64,12 @@ public class RoleRepository : RepositoryBase<Role>, IRoleRepository
 
         return await query.AnyAsync(cancellationToken);
     }
+
+    public Task DeleteAsync(Role role, CancellationToken cancellationToken = default)
+    {
+        Context.Roles.Remove(role);
+        return Task.CompletedTask;
+    }
 }
 
 /// <summary>

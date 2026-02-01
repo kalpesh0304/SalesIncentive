@@ -27,6 +27,11 @@ public class Department : AuditableEntity, IAggregateRoot
     private readonly List<Department> _childDepartments = new();
     public IReadOnlyCollection<Department> ChildDepartments => _childDepartments.AsReadOnly();
 
+    /// <summary>
+    /// Parent department (for self-referential hierarchy).
+    /// </summary>
+    public Department? Parent { get; private set; }
+
     private Department() { } // EF Core constructor
 
     public static Department Create(

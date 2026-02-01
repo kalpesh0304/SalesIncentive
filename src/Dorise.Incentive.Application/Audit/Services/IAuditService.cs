@@ -97,9 +97,28 @@ public interface IAuditService
         Dictionary<string, object>? data = null,
         CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Logs an activity with detailed tracking.
+    /// </summary>
+    Task LogActivityAsync(
+        string entityType,
+        string entityId,
+        string action,
+        string description,
+        Dictionary<string, object?>? oldValues = null,
+        Dictionary<string, object?>? newValues = null,
+        CancellationToken cancellationToken = default);
+
     #endregion
 
     #region Audit Queries
+
+    /// <summary>
+    /// Gets audit logs matching the query criteria.
+    /// </summary>
+    Task<IReadOnlyList<AuditLogDto>> GetAuditLogsAsync(
+        AuditLogSearchQuery query,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Searches audit logs with filters.
