@@ -32,4 +32,9 @@ public interface IFeatureFlagRepository : IRepository<FeatureFlag>
     /// Checks if a feature is enabled for a specific user.
     /// </summary>
     Task<bool> IsEnabledForUserAsync(string name, Guid userId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Deletes a feature flag.
+    /// </summary>
+    Task DeleteAsync(FeatureFlag featureFlag, CancellationToken cancellationToken = default);
 }

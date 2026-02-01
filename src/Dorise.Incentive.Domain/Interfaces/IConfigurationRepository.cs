@@ -30,4 +30,18 @@ public interface IConfigurationRepository : IRepository<SystemConfiguration>
     /// Checks if a configuration with the given key exists.
     /// </summary>
     Task<bool> ExistsAsync(string key, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Searches configurations with filters.
+    /// </summary>
+    Task<IReadOnlyList<SystemConfiguration>> SearchAsync(
+        ConfigurationCategory? category,
+        string? keyPrefix,
+        bool? isEffective,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Deletes a configuration.
+    /// </summary>
+    Task DeleteAsync(SystemConfiguration configuration, CancellationToken cancellationToken = default);
 }

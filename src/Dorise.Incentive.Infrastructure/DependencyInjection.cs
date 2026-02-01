@@ -1,5 +1,6 @@
 using Dorise.Incentive.Application.Audit.Services;
 using Dorise.Incentive.Application.Common.Interfaces;
+using Dorise.Incentive.Application.Configuration.Services;
 using Dorise.Incentive.Application.Dashboard.Services;
 using Dorise.Incentive.Application.Integrations.Services;
 using Dorise.Incentive.Application.Jobs.Services;
@@ -10,6 +11,7 @@ using Dorise.Incentive.Application.Security.Services;
 using Dorise.Incentive.Domain.Interfaces;
 using Dorise.Incentive.Infrastructure.Audit;
 using Dorise.Incentive.Infrastructure.Caching;
+using Dorise.Incentive.Infrastructure.Configuration;
 using Dorise.Incentive.Infrastructure.Dashboard;
 using Dorise.Incentive.Infrastructure.Integrations;
 using Dorise.Incentive.Infrastructure.Jobs;
@@ -71,6 +73,9 @@ public static class DependencyInjection
         services.AddScoped<IPlanAssignmentRepository, PlanAssignmentRepository>();
         services.AddScoped<IEmailTemplateRepository, EmailTemplateRepository>();
         services.AddScoped<ICalculationParameterRepository, CalculationParameterRepository>();
+        services.AddScoped<IConfigurationRepository, ConfigurationRepository>();
+        services.AddScoped<IFeatureFlagRepository, FeatureFlagRepository>();
+        services.AddScoped<IJobScheduleRepository, JobScheduleRepository>();
 
         // Read-Only Repository Aggregator (for query handlers)
         services.AddScoped<IReadOnlyRepository, ReadOnlyRepository>();
@@ -100,6 +105,13 @@ public static class DependencyInjection
 
         // Job Services
         services.AddScoped<IJobService, JobService>();
+        services.AddScoped<IJobScheduleService, JobScheduleService>();
+        services.AddScoped<IBatchOperationService, BatchOperationService>();
+
+        // Configuration Services
+        services.AddScoped<IConfigurationService, ConfigurationService>();
+        services.AddScoped<IFeatureFlagService, FeatureFlagService>();
+        services.AddScoped<IEmailTemplateService, EmailTemplateService>();
 
         // Caching Services
         services.AddDistributedMemoryCache(); // Use Redis in production

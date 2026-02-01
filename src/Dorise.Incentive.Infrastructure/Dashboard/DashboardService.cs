@@ -136,8 +136,8 @@ public class DashboardService : IDashboardService
             TotalIncentivesChange = currentTotal - previousTotal,
             TotalEmployees = activeEmployees.Count,
             TotalEmployeesChange = 0, // Would need historical employee data
-            AverageAchievement = currentAvgAchievement,
-            AverageAchievementChange = currentAvgAchievement - previousAvgAchievement,
+            AverageAchievement = (double)currentAvgAchievement,
+            AverageAchievementChange = (double)(currentAvgAchievement - previousAvgAchievement),
             PendingApprovals = pendingApprovals.Count,
             OverdueApprovals = overdueApprovals,
             Currency = calculations.FirstOrDefault()?.NetIncentive.Currency ?? "USD"
@@ -181,7 +181,7 @@ public class DashboardService : IDashboardService
             TotalPaidAmount = paidCalculations.Sum(c => c.NetIncentive.Amount),
             TotalPendingAmount = pendingCalculations.Sum(c => c.NetIncentive.Amount),
             AverageAchievementPercentage = calculations.Any()
-                ? calculations.Average(c => c.AchievementPercentage.Value)
+                ? (double)calculations.Average(c => c.AchievementPercentage.Value)
                 : 0,
             Currency = calculations.FirstOrDefault()?.NetIncentive.Currency ?? "USD"
         };
@@ -373,13 +373,13 @@ public class DashboardService : IDashboardService
             return new PerformanceMetricsDto();
         }
 
-        var achievements = calculations.Select(c => c.AchievementPercentage.Value).OrderBy(a => a).ToList();
+        var achievements = calculations.Select(c => (double)c.AchievementPercentage.Value).OrderBy(a => a).ToList();
         var median = achievements[achievements.Count / 2];
 
         const double targetThreshold = 100.0;
-        var aboveTarget = calculations.Count(c => c.AchievementPercentage.Value > targetThreshold);
-        var atTarget = calculations.Count(c => Math.Abs(c.AchievementPercentage.Value - targetThreshold) < 5);
-        var belowTarget = calculations.Count(c => c.AchievementPercentage.Value < targetThreshold - 5);
+        var aboveTarget = calculations.Count(c => (double)c.AchievementPercentage.Value > targetThreshold);
+        var atTarget = calculations.Count(c => Math.Abs((double)c.AchievementPercentage.Value - targetThreshold) < 5);
+        var belowTarget = calculations.Count(c => (double)c.AchievementPercentage.Value < targetThreshold - 5);
 
         var employeeDepts = employees.ToDictionary(e => e.Id, e => e.DepartmentId);
         var deptNames = departments.ToDictionary(d => d.Id, d => d.Name);
@@ -389,21 +389,21 @@ public class DashboardService : IDashboardService
             .GroupBy(c => employeeDepts[c.EmployeeId])
             .ToDictionary(
                 g => deptNames.GetValueOrDefault(g.Key, "Unknown"),
-                g => g.Average(c => c.AchievementPercentage.Value));
+                g => (double)g.Average(c => c.AchievementPercentage.Value));
 
         var planNames = plans.ToDictionary(p => p.Id, p => p.Name);
         var achievementByPlan = calculations
             .GroupBy(c => c.IncentivePlanId)
             .ToDictionary(
                 g => planNames.GetValueOrDefault(g.Key, "Unknown"),
-                g => g.Average(c => c.AchievementPercentage.Value));
+                g => (double)g.Average(c => c.AchievementPercentage.Value));
 
         return new PerformanceMetricsDto
         {
-            AverageAchievement = achievements.Average(),
+            AverageAchievement = achievements.Any() ? achievements.Average() : 0,
             MedianAchievement = median,
-            HighestAchievement = achievements.Max(),
-            LowestAchievement = achievements.Min(),
+            HighestAchievement = achievements.Any() ? achievements.Max() : 0,
+            LowestAchievement = achievements.Any() ? achievements.Min() : 0,
             AboveTargetCount = aboveTarget,
             AtTargetCount = atTarget,
             BelowTargetCount = belowTarget,
@@ -448,7 +448,7 @@ public class DashboardService : IDashboardService
                 TotalIncentive = calculations.Sum(c => c.NetIncentive.Amount),
                 CalculationCount = calculations.Count,
                 AverageAchievement = calculations.Any()
-                    ? calculations.Average(c => c.AchievementPercentage.Value)
+                    ? (double)calculations.Average(c => c.AchievementPercentage.Value)
                     : 0,
                 AverageIncentive = calculations.Any()
                     ? calculations.Average(c => c.NetIncentive.Amount)
@@ -484,7 +484,7 @@ public class DashboardService : IDashboardService
         // Get previous period for comparison
         var previousPeriod = GetPreviousPeriod(period);
         var previousCalcs = await _calculationRepository.GetByPeriodAsync(previousPeriod, cancellationToken);
-        var previousAchievements = previousCalcs.ToDictionary(c => c.EmployeeId, c => c.AchievementPercentage.Value);
+        var previousAchievements = previousCalcs.ToDictionary(c => c.EmployeeId, c => (double)c.AchievementPercentage.Value);
 
         var topPerformers = calculations
             .OrderByDescending(c => c.AchievementPercentage.Value)
@@ -504,10 +504,10 @@ public class DashboardService : IDashboardService
                         ? dept
                         : null,
                     Position = employee?.Designation,
-                    AchievementPercentage = c.AchievementPercentage.Value,
+                    AchievementPercentage = (double)c.AchievementPercentage.Value,
                     IncentiveAmount = c.NetIncentive.Amount,
                     Rank = index + 1,
-                    ChangeFromPreviousPeriod = c.AchievementPercentage.Value - previousAchievement,
+                    ChangeFromPreviousPeriod = (double)c.AchievementPercentage.Value - previousAchievement,
                     Currency = c.NetIncentive.Currency
                 };
             })
@@ -536,7 +536,7 @@ public class DashboardService : IDashboardService
                 .Where(c => employeeDepts.TryGetValue(c.EmployeeId, out var deptId) && deptId == dept.Id)
                 .ToList();
 
-            var aboveTarget = deptCalculations.Count(c => c.AchievementPercentage.Value > 100);
+            var aboveTarget = deptCalculations.Count(c => (double)c.AchievementPercentage.Value > 100);
 
             return new DepartmentSummaryDto
             {
@@ -550,7 +550,7 @@ public class DashboardService : IDashboardService
                     ? deptCalculations.Average(c => c.NetIncentive.Amount)
                     : 0,
                 AverageAchievement = deptCalculations.Any()
-                    ? deptCalculations.Average(c => c.AchievementPercentage.Value)
+                    ? (double)deptCalculations.Average(c => c.AchievementPercentage.Value)
                     : 0,
                 AboveTargetCount = aboveTarget,
                 AboveTargetPercentage = deptCalculations.Any()
@@ -676,7 +676,7 @@ public class DashboardService : IDashboardService
                     Department = employee != null && deptDict.TryGetValue(employee.DepartmentId, out var dept)
                         ? dept
                         : null,
-                    AchievementPercentage = c.AchievementPercentage.Value,
+                    AchievementPercentage = (double)c.AchievementPercentage.Value,
                     IncentiveAmount = c.NetIncentive.Amount,
                     Currency = c.NetIncentive.Currency
                 };
@@ -719,10 +719,10 @@ public class DashboardService : IDashboardService
             : 0;
 
         var currentAvgAchievement = currentCalcs.Any()
-            ? currentCalcs.Average(c => c.AchievementPercentage.Value)
+            ? (double)currentCalcs.Average(c => c.AchievementPercentage.Value)
             : 0;
         var previousAvgAchievement = previousCalcs.Any()
-            ? previousCalcs.Average(c => c.AchievementPercentage.Value)
+            ? (double)previousCalcs.Average(c => c.AchievementPercentage.Value)
             : 0;
 
         return new PeriodComparisonDto

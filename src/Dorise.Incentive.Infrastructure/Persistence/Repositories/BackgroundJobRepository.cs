@@ -168,4 +168,10 @@ public class JobScheduleRepository : RepositoryBase<JobSchedule>, IJobScheduleRe
         return await DbSet
             .AnyAsync(s => s.ScheduleName == scheduleName, cancellationToken);
     }
+
+    public Task DeleteAsync(JobSchedule schedule, CancellationToken cancellationToken = default)
+    {
+        Remove(schedule);
+        return Task.CompletedTask;
+    }
 }

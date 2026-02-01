@@ -52,7 +52,7 @@ public class IncentivePlanRepository : AggregateRepositoryBase<IncentivePlan>, I
             .Where(p =>
                 p.Status == PlanStatus.Active &&
                 p.EffectivePeriod.StartDate <= effectiveDate &&
-                (p.EffectivePeriod.EndDate == null || p.EffectivePeriod.EndDate >= effectiveDate))
+                p.EffectivePeriod.EndDate >= effectiveDate)
             .OrderBy(p => p.Name)
             .ToListAsync(cancellationToken);
     }
@@ -80,7 +80,7 @@ public class IncentivePlanRepository : AggregateRepositoryBase<IncentivePlan>, I
             query = query.Where(p =>
                 p.Status == PlanStatus.Active &&
                 p.EffectivePeriod.StartDate <= effectiveDate.Value &&
-                (p.EffectivePeriod.EndDate == null || p.EffectivePeriod.EndDate >= effectiveDate.Value));
+                p.EffectivePeriod.EndDate >= effectiveDate.Value);
         }
 
         return await query.OrderBy(p => p.Name).ToListAsync(cancellationToken);
@@ -100,7 +100,7 @@ public class IncentivePlanRepository : AggregateRepositoryBase<IncentivePlan>, I
         return await DbSet
             .Where(p =>
                 p.EffectivePeriod.StartDate <= period.EndDate &&
-                (p.EffectivePeriod.EndDate == null || p.EffectivePeriod.EndDate >= period.StartDate))
+                p.EffectivePeriod.EndDate >= period.StartDate)
             .OrderBy(p => p.EffectivePeriod.StartDate)
             .ToListAsync(cancellationToken);
     }
