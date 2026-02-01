@@ -1,6 +1,6 @@
+using Dorise.Incentive.Application.Common.Interfaces;
 using Dorise.Incentive.Application.IncentivePlans.Commands.ActivatePlan;
 using Dorise.Incentive.Application.IncentivePlans.Commands.CreatePlan;
-using Dorise.Incentive.Application.IncentivePlans.Commands.SuspendPlan;
 using Dorise.Incentive.Application.IncentivePlans.Commands.UpdatePlan;
 using Dorise.Incentive.Application.IncentivePlans.DTOs;
 using Dorise.Incentive.Application.IncentivePlans.Queries;

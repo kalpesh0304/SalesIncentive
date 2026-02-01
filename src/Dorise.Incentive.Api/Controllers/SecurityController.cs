@@ -1,8 +1,10 @@
+using Asp.Versioning;
 using Dorise.Incentive.Application.Security.DTOs;
 using Dorise.Incentive.Application.Security.Services;
 using Dorise.Incentive.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using IAppAuthorizationService = Dorise.Incentive.Application.Security.Services.IAuthorizationService;
 
 namespace Dorise.Incentive.Api.Controllers;
 
@@ -17,14 +19,14 @@ namespace Dorise.Incentive.Api.Controllers;
 [Produces("application/json")]
 public class SecurityController : ControllerBase
 {
-    private readonly IAuthorizationService _authorizationService;
+    private readonly IAppAuthorizationService _authorizationService;
     private readonly IRoleManagementService _roleManagementService;
     private readonly IUserRoleService _userRoleService;
     private readonly ISecurityAuditService _auditService;
     private readonly ILogger<SecurityController> _logger;
 
     public SecurityController(
-        IAuthorizationService authorizationService,
+        IAppAuthorizationService authorizationService,
         IRoleManagementService roleManagementService,
         IUserRoleService userRoleService,
         ISecurityAuditService auditService,
