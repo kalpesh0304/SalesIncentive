@@ -38,4 +38,10 @@ public class EmailTemplateRepository : RepositoryBase<EmailTemplate>, IEmailTemp
         return await DbSet
             .AnyAsync(t => t.TemplateName == templateName, cancellationToken);
     }
+
+    public Task DeleteAsync(EmailTemplate template, CancellationToken cancellationToken = default)
+    {
+        Remove(template);
+        return Task.CompletedTask;
+    }
 }

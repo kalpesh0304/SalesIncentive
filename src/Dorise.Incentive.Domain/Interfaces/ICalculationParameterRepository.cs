@@ -56,4 +56,18 @@ public interface ICalculationParameterRepository : IRepository<CalculationParame
         ParameterScope scope,
         Guid? scopeId = null,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets all effective parameters for a scope at a given date.
+    /// </summary>
+    Task<IReadOnlyList<CalculationParameter>> GetEffectiveForScopeAsync(
+        ParameterScope scope,
+        Guid? scopeId,
+        DateTime asOfDate,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Deletes a calculation parameter.
+    /// </summary>
+    Task DeleteAsync(CalculationParameter parameter, CancellationToken cancellationToken = default);
 }

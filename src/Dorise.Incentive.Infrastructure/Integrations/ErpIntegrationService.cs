@@ -97,7 +97,7 @@ public class ErpIntegrationService : IErpIntegrationService
 
                 // Find the employee
                 var employee = await _employeeRepository.GetByCodeAsync(
-                    new EmployeeCode(record.EmployeeCode),
+                    EmployeeCode.Create(record.EmployeeCode),
                     cancellationToken);
 
                 if (employee == null)

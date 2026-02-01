@@ -97,13 +97,27 @@ public class CalculationParameterService : ICalculationParameterService
         CalculationParameterSearchQuery query,
         CancellationToken cancellationToken = default)
     {
+        // Search using the repository's date-based filtering
+        // When IsEffective is specified, we use AsOfDate as the effective date range
+        var effectiveFrom = query.IsEffective == true ? query.AsOfDate : null;
+        var effectiveTo = query.IsEffective == true ? query.AsOfDate : null;
+
         var parameters = await _repository.SearchAsync(
             query.ParameterName,
             query.Scope,
             query.ScopeId,
-            query.IsEffective,
-            query.AsOfDate,
+            effectiveFrom,
+            effectiveTo,
             cancellationToken);
+
+        // If IsEffective filter is specified, further filter results
+        if (query.IsEffective.HasValue)
+        {
+            var asOfDate = query.AsOfDate ?? DateTime.UtcNow;
+            parameters = parameters
+                .Where(p => p.IsEffective(asOfDate) == query.IsEffective.Value)
+                .ToList();
+        }
 
         return parameters.Select(MapToDto).ToList();
     }

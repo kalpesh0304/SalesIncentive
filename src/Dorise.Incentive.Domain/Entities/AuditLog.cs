@@ -73,6 +73,7 @@ public enum AuditAction
     Update,
     Delete,
     View,
+    Access, // For data access logging
     Export,
     Import,
     Approve,
@@ -84,5 +85,6 @@ public enum AuditAction
     PermissionChange,
     ConfigurationChange,
     BulkOperation,
-    SystemEvent
+    SystemEvent,
+    Custom // For custom/unclassified actions
 }

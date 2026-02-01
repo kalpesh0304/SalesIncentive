@@ -22,4 +22,9 @@ public interface IEmailTemplateRepository : IRepository<EmailTemplate>
     /// Checks if an email template with the given name exists.
     /// </summary>
     Task<bool> ExistsAsync(string templateName, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Deletes an email template.
+    /// </summary>
+    Task DeleteAsync(EmailTemplate template, CancellationToken cancellationToken = default);
 }
