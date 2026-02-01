@@ -50,7 +50,7 @@ public class DashboardController : ControllerBase
         var query = new GetDashboardQuery(topPerformerCount);
         var result = await _mediator.Send(query, cancellationToken);
 
-        return result.Match(
+        return result.Match<IActionResult>(
             success => Ok(success),
             error => BadRequest(new { Error = error }));
     }
@@ -66,7 +66,7 @@ public class DashboardController : ControllerBase
         var query = new GetDashboardQuery(0);
         var result = await _mediator.Send(query, cancellationToken);
 
-        return result.Match(
+        return result.Match<IActionResult>(
             success => Ok(success.Kpis),
             error => BadRequest(new { Error = error }));
     }
@@ -82,7 +82,7 @@ public class DashboardController : ControllerBase
         var query = new GetDashboardQuery(0);
         var result = await _mediator.Send(query, cancellationToken);
 
-        return result.Match(
+        return result.Match<IActionResult>(
             success => Ok(success.MonthlyTrend),
             error => BadRequest(new { Error = error }));
     }
@@ -100,7 +100,7 @@ public class DashboardController : ControllerBase
         var query = new GetDashboardQuery(count);
         var result = await _mediator.Send(query, cancellationToken);
 
-        return result.Match(
+        return result.Match<IActionResult>(
             success => Ok(success.TopPerformers),
             error => BadRequest(new { Error = error }));
     }
@@ -116,7 +116,7 @@ public class DashboardController : ControllerBase
         var query = new GetDashboardQuery(0);
         var result = await _mediator.Send(query, cancellationToken);
 
-        return result.Match(
+        return result.Match<IActionResult>(
             success => Ok(success.PendingActions),
             error => BadRequest(new { Error = error }));
     }

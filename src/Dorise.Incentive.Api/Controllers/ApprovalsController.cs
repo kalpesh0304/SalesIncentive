@@ -41,7 +41,7 @@ public class ApprovalsController : ControllerBase
         var query = new GetPendingApprovalsForUserQuery(approverId, page, pageSize);
         var result = await _mediator.Send(query, cancellationToken);
 
-        return result.Match(
+        return result.Match<IActionResult>(
             success => Ok(success),
             error => BadRequest(new { Error = error }));
     }
@@ -61,7 +61,7 @@ public class ApprovalsController : ControllerBase
         var query = new GetApprovalHistoryQuery(approverId, status, page, pageSize);
         var result = await _mediator.Send(query, cancellationToken);
 
-        return result.Match(
+        return result.Match<IActionResult>(
             success => Ok(success),
             error => BadRequest(new { Error = error }));
     }
@@ -77,7 +77,7 @@ public class ApprovalsController : ControllerBase
         var query = new GetApprovalDashboardQuery(approverId);
         var result = await _mediator.Send(query, cancellationToken);
 
-        return result.Match(
+        return result.Match<IActionResult>(
             success => Ok(success),
             error => BadRequest(new { Error = error }));
     }
@@ -95,7 +95,7 @@ public class ApprovalsController : ControllerBase
         var query = new GetApprovalByIdQuery(approvalId);
         var result = await _mediator.Send(query, cancellationToken);
 
-        return result.Match(
+        return result.Match<IActionResult>(
             approval => approval != null ? Ok(approval) : NotFound(),
             error => BadRequest(new { Error = error }));
     }
@@ -114,7 +114,7 @@ public class ApprovalsController : ControllerBase
         var command = new ApproveCommand(approvalId, request.Comments);
         var result = await _mediator.Send(command, cancellationToken);
 
-        return result.Match(
+        return result.Match<IActionResult>(
             success => Ok(success),
             error => BadRequest(new { Error = error }));
     }
@@ -133,7 +133,7 @@ public class ApprovalsController : ControllerBase
         var command = new RejectCommand(approvalId, request.Reason);
         var result = await _mediator.Send(command, cancellationToken);
 
-        return result.Match(
+        return result.Match<IActionResult>(
             success => Ok(success),
             error => BadRequest(new { Error = error }));
     }
@@ -151,7 +151,7 @@ public class ApprovalsController : ControllerBase
         var command = new BulkApproveCommand(request.ApprovalIds, request.Comments);
         var result = await _mediator.Send(command, cancellationToken);
 
-        return result.Match(
+        return result.Match<IActionResult>(
             success => Ok(success),
             error => BadRequest(new { Error = error }));
     }
@@ -170,7 +170,7 @@ public class ApprovalsController : ControllerBase
         var command = new DelegateApprovalCommand(approvalId, request.DelegateToId);
         var result = await _mediator.Send(command, cancellationToken);
 
-        return result.Match(
+        return result.Match<IActionResult>(
             success => Ok(success),
             error => BadRequest(new { Error = error }));
     }
@@ -189,7 +189,7 @@ public class ApprovalsController : ControllerBase
         var command = new EscalateApprovalCommand(approvalId, request.Reason);
         var result = await _mediator.Send(command, cancellationToken);
 
-        return result.Match(
+        return result.Match<IActionResult>(
             success => Ok(success),
             error => BadRequest(new { Error = error }));
     }
@@ -207,7 +207,7 @@ public class ApprovalsController : ControllerBase
         var command = new SubmitForApprovalCommand(request.CalculationIds);
         var result = await _mediator.Send(command, cancellationToken);
 
-        return result.Match(
+        return result.Match<IActionResult>(
             success => Ok(success),
             error => BadRequest(new { Error = error }));
     }
@@ -224,7 +224,7 @@ public class ApprovalsController : ControllerBase
         var query = new GetApprovalsForCalculationQuery(calculationId);
         var result = await _mediator.Send(query, cancellationToken);
 
-        return result.Match(
+        return result.Match<IActionResult>(
             success => Ok(success),
             error => BadRequest(new { Error = error }));
     }

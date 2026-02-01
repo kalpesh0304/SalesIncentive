@@ -123,9 +123,12 @@ public class AuditController : ControllerBase
     /// </summary>
     [HttpGet("statistics")]
     [ProducesResponseType(typeof(AuditStatisticsDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetStatistics(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetStatistics(
+        [FromQuery] DateTime? fromDate,
+        [FromQuery] DateTime? toDate,
+        CancellationToken cancellationToken)
     {
-        var statistics = await _auditService.GetStatisticsAsync(cancellationToken);
+        var statistics = await _auditService.GetStatisticsAsync(fromDate, toDate, cancellationToken);
         return Ok(statistics);
     }
 
@@ -149,19 +152,17 @@ public class AuditController : ControllerBase
     [HttpGet("reports/approval-compliance")]
     [ProducesResponseType(typeof(ApprovalComplianceReportDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetApprovalComplianceReport(
-        [FromQuery] DateTime? fromDate,
-        [FromQuery] DateTime? toDate,
+        [FromQuery] string? period,
         CancellationToken cancellationToken)
     {
-        var from = fromDate ?? DateTime.UtcNow.AddMonths(-1);
-        var to = toDate ?? DateTime.UtcNow;
+        var reportPeriod = period ?? DateTime.UtcNow.ToString("yyyy-MM");
 
         _logger.LogInformation(
-            "Generating approval compliance report from {FromDate} to {ToDate}",
-            from, to);
+            "Generating approval compliance report for period {Period}",
+            reportPeriod);
 
         var report = await _auditService.GetApprovalComplianceReportAsync(
-            from, to, cancellationToken);
+            reportPeriod, cancellationToken);
 
         return Ok(report);
     }
@@ -229,13 +230,13 @@ public class AuditController : ControllerBase
         [FromQuery] int? retentionDays,
         CancellationToken cancellationToken)
     {
-        var days = retentionDays ?? 365; // Default 1 year retention
+        var days = retentionDays ?? 365; // Default 1 year retention (used for reporting only)
 
         _logger.LogWarning(
-            "Purging audit logs older than {Days} days",
+            "Purging audit logs based on retention policy (suggested: {Days} days)",
             days);
 
-        var deletedCount = await _auditService.PurgeOldLogsAsync(days, cancellationToken);
+        var deletedCount = await _auditService.PurgeOldLogsAsync(cancellationToken);
 
         return Ok(new PurgeResultDto
         {
@@ -252,22 +253,25 @@ public class AuditController : ControllerBase
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(ArchiveResultDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> ArchiveLogs(
-        [FromQuery] DateTime? olderThan,
+        [FromQuery] DateTime? fromDate,
+        [FromQuery] DateTime? toDate,
         CancellationToken cancellationToken)
     {
-        var cutoffDate = olderThan ?? DateTime.UtcNow.AddYears(-1);
+        // Default: archive logs older than 1 year (from the beginning up to 1 year ago)
+        var from = fromDate ?? DateTime.MinValue;
+        var to = toDate ?? DateTime.UtcNow.AddYears(-1);
 
         _logger.LogInformation(
-            "Archiving audit logs older than {CutoffDate}",
-            cutoffDate);
+            "Archiving audit logs from {FromDate} to {ToDate}",
+            from, to);
 
         var archivePath = await _auditService.ArchiveLogsAsync(
-            cutoffDate, cancellationToken);
+            from, to, cancellationToken);
 
         return Ok(new ArchiveResultDto
         {
             ArchivePath = archivePath,
-            CutoffDate = cutoffDate,
+            CutoffDate = to,
             ArchivedAt = DateTime.UtcNow
         });
     }
@@ -282,29 +286,10 @@ public class AuditController : ControllerBase
         [FromBody] CreateAuditLogRequest request,
         CancellationToken cancellationToken)
     {
-        var userId = GetCurrentUserId();
-        var userName = GetCurrentUserName();
-        var userEmail = GetCurrentUserEmail();
-        var ipAddress = GetClientIpAddress();
-        var userAgent = Request.Headers["User-Agent"].FirstOrDefault();
         var correlationId = Request.Headers["X-Correlation-ID"].FirstOrDefault()
             ?? HttpContext.TraceIdentifier;
 
-        await _auditService.LogAsync(
-            request.EntityType,
-            request.EntityId,
-            request.Action,
-            request.OldValue,
-            request.NewValue,
-            userId,
-            userName,
-            userEmail,
-            ipAddress,
-            userAgent,
-            request.Reason,
-            correlationId,
-            request.AdditionalData,
-            cancellationToken);
+        await _auditService.LogAsync(request, cancellationToken);
 
         // Get the created audit log
         var query = new AuditLogSearchQuery
@@ -344,11 +329,8 @@ public class AuditController : ControllerBase
         // Log the export action
         await _auditService.LogExportAsync(
             "AuditLog",
-            GetCurrentUserId(),
-            GetCurrentUserName(),
-            GetClientIpAddress(),
             result.Items.Count,
-            new Dictionary<string, object> { ["Query"] = query },
+            "csv",
             cancellationToken);
 
         return File(bytes, "text/csv", fileName);
