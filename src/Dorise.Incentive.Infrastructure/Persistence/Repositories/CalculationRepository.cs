@@ -243,8 +243,8 @@ public class CalculationRepository : AggregateRepositoryBase<Calculation>, ICalc
                 ? query.OrderByDescending(c => c.NetIncentive.Amount)
                 : query.OrderBy(c => c.NetIncentive.Amount),
             "achievement" => sortDescending
-                ? query.OrderByDescending(c => c.Achievement.Value)
-                : query.OrderBy(c => c.Achievement.Value),
+                ? query.OrderByDescending(c => c.AchievementPercentage.Value)
+                : query.OrderBy(c => c.AchievementPercentage.Value),
             "status" => sortDescending
                 ? query.OrderByDescending(c => c.Status)
                 : query.OrderBy(c => c.Status),
@@ -351,5 +351,21 @@ public class CalculationRepository : AggregateRepositoryBase<Calculation>, ICalc
             .ToListAsync(cancellationToken);
 
         return (items, totalCount);
+    }
+
+    public async Task<IReadOnlyList<Calculation>> GetByPeriodAsync(
+        string period,
+        CancellationToken cancellationToken = default)
+    {
+        // Parse period in format "yyyy-MM" to date range
+        if (!DateTime.TryParse(period + "-01", out var periodDate))
+        {
+            return Array.Empty<Calculation>();
+        }
+
+        var periodStart = new DateTime(periodDate.Year, periodDate.Month, 1);
+        var periodEnd = periodStart.AddMonths(1).AddDays(-1);
+
+        return await GetByPeriodAsync(periodStart, periodEnd, cancellationToken: cancellationToken);
     }
 }

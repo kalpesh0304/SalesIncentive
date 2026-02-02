@@ -1,24 +1,22 @@
 using Dorise.Incentive.Application.Audit.Services;
 using Dorise.Incentive.Application.Common.Interfaces;
 using Dorise.Incentive.Application.Configuration.Services;
-using Dorise.Incentive.Application.DataTransfer.Services;
-using Dorise.Incentive.Application.Jobs.Services;
-using Dorise.Incentive.Application.Performance.Services;
 using Dorise.Incentive.Application.Dashboard.Services;
 using Dorise.Incentive.Application.Integrations.Services;
+using Dorise.Incentive.Application.Jobs.Services;
 using Dorise.Incentive.Application.Notifications.Services;
+using Dorise.Incentive.Application.Performance.Services;
 using Dorise.Incentive.Application.Reports.Services;
 using Dorise.Incentive.Application.Security.Services;
 using Dorise.Incentive.Domain.Interfaces;
 using Dorise.Incentive.Infrastructure.Audit;
+using Dorise.Incentive.Infrastructure.Caching;
 using Dorise.Incentive.Infrastructure.Configuration;
 using Dorise.Incentive.Infrastructure.Dashboard;
-using Dorise.Incentive.Infrastructure.DataTransfer;
 using Dorise.Incentive.Infrastructure.Integrations;
 using Dorise.Incentive.Infrastructure.Jobs;
-using Dorise.Incentive.Infrastructure.Caching;
-using Dorise.Incentive.Infrastructure.Performance;
 using Dorise.Incentive.Infrastructure.Notifications;
+using Dorise.Incentive.Infrastructure.Performance;
 using Dorise.Incentive.Infrastructure.Persistence;
 using Dorise.Incentive.Infrastructure.Persistence.Repositories;
 using Dorise.Incentive.Infrastructure.Reports;
@@ -28,6 +26,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using IAppAuthorizationService = Dorise.Incentive.Application.Security.Services.IAuthorizationService;
 
 namespace Dorise.Incentive.Infrastructure;
 
@@ -61,18 +60,33 @@ public static class DependencyInjection
             .AddInterceptors(auditInterceptor);
         });
 
-        // Repositories
+        // Core Repositories
         services.AddScoped<IEmployeeRepository, EmployeeRepository>();
         services.AddScoped<IIncentivePlanRepository, IncentivePlanRepository>();
         services.AddScoped<ICalculationRepository, CalculationRepository>();
         services.AddScoped<IDepartmentRepository, DepartmentRepository>();
         services.AddScoped<IApprovalRepository, ApprovalRepository>();
+        services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+        services.AddScoped<IRoleRepository, RoleRepository>();
+        services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+        services.AddScoped<IBackgroundJobRepository, BackgroundJobRepository>();
+        services.AddScoped<IPlanAssignmentRepository, PlanAssignmentRepository>();
+        services.AddScoped<IEmailTemplateRepository, EmailTemplateRepository>();
+        services.AddScoped<ICalculationParameterRepository, CalculationParameterRepository>();
+        services.AddScoped<IConfigurationRepository, ConfigurationRepository>();
+        services.AddScoped<IFeatureFlagRepository, FeatureFlagRepository>();
+        services.AddScoped<IJobScheduleRepository, JobScheduleRepository>();
+
+        // Read-Only Repository Aggregator (for query handlers)
+        services.AddScoped<IReadOnlyRepository, ReadOnlyRepository>();
 
         // Unit of Work
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-        // Services
-        services.AddScoped<IDateTimeService, DateTimeService>();
+        // Audit Services
+        services.AddScoped<IAuditService, AuditService>();
+
+        // Export Services
         services.AddScoped<IExportService, ExportService>();
 
         // Integration Services
@@ -85,61 +99,19 @@ public static class DependencyInjection
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<INotificationService, NotificationService>();
 
-        // Audit Services
-        services.AddScoped<IAuditLogRepository, AuditLogRepository>();
-        services.AddScoped<IAuditService, AuditService>();
-
         // Dashboard & Reporting Services
         services.AddScoped<IDashboardService, DashboardService>();
         services.AddScoped<IReportGenerationService, ReportGenerationService>();
 
-        // Security & RBAC Services
-        services.AddScoped<IRoleRepository, RoleRepository>();
-        services.AddScoped<IUserRoleRepository, UserRoleRepository>();
-        services.AddScoped<IAuthorizationService, AuthorizationService>();
-        services.AddScoped<IRoleManagementService, RoleManagementService>();
-        services.AddScoped<IUserRoleService, UserRoleService>();
-        services.AddScoped<ISecurityAuditService, SecurityAuditService>();
-
-        // Authorization Handlers
-        services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
-        services.AddScoped<IAuthorizationHandler, ExtendedPermissionAuthorizationHandler>();
-        services.AddScoped<IAuthorizationHandler, AnyPermissionAuthorizationHandler>();
-
-        // Authorization Policy Provider
-        services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
-
-        // Memory cache for permission caching
-        services.AddMemoryCache();
-
-        // Configuration Services
-        services.AddScoped<IConfigurationRepository, ConfigurationRepository>();
-        services.AddScoped<IFeatureFlagRepository, FeatureFlagRepository>();
-        services.AddScoped<IEmailTemplateRepository, EmailTemplateRepository>();
-        services.AddScoped<ICalculationParameterRepository, CalculationParameterRepository>();
-        services.AddScoped<IConfigurationService, ConfigurationService>();
-        services.AddScoped<IFeatureFlagService, FeatureFlagService>();
-        services.AddScoped<IEmailTemplateService, EmailTemplateService>();
-        services.AddScoped<ICalculationParameterService, CalculationParameterService>();
-        services.AddScoped<IConfigurationExportService, ConfigurationExportService>();
-
         // Job Services
-        services.AddScoped<IBackgroundJobRepository, BackgroundJobRepository>();
-        services.AddScoped<IJobScheduleRepository, JobScheduleRepository>();
         services.AddScoped<IJobService, JobService>();
         services.AddScoped<IJobScheduleService, JobScheduleService>();
         services.AddScoped<IBatchOperationService, BatchOperationService>();
 
-        // Data Transfer Services
-        services.AddScoped<IDataImportRepository, DataImportRepository>();
-        services.AddScoped<IDataExportRepository, DataExportRepository>();
-        services.AddScoped<IDataTransferTemplateRepository, DataTransferTemplateRepository>();
-        services.AddScoped<IImportFieldMappingRepository, ImportFieldMappingRepository>();
-        services.AddScoped<IDataImportService, DataImportService>();
-        services.AddScoped<IDataExportService, DataExportService>();
-        services.AddScoped<IDataTransferTemplateService, DataTransferTemplateService>();
-        services.AddScoped<IFileParserService, FileParserService>();
-        services.AddScoped<IDataTransferStatisticsService, DataTransferStatisticsService>();
+        // Configuration Services
+        services.AddScoped<IConfigurationService, ConfigurationService>();
+        services.AddScoped<IFeatureFlagService, FeatureFlagService>();
+        services.AddScoped<IEmailTemplateService, EmailTemplateService>();
 
         // Caching Services
         services.AddDistributedMemoryCache(); // Use Redis in production
@@ -150,6 +122,18 @@ public static class DependencyInjection
         // Performance Services
         services.AddSingleton<IPerformanceMonitorService, PerformanceMonitorService>();
         services.AddSingleton<ICacheManagementService, CacheManagementService>();
+
+        // Security & RBAC Services
+        services.AddScoped<IAppAuthorizationService, AuthorizationService>();
+        services.AddScoped<IRoleManagementService, RoleManagementService>();
+        services.AddScoped<IUserRoleService, UserRoleService>();
+        services.AddScoped<ISecurityAuditService, SecurityAuditService>();
+
+        // Authorization Handlers
+        services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
+
+        // Memory cache for permission caching
+        services.AddMemoryCache();
 
         return services;
     }

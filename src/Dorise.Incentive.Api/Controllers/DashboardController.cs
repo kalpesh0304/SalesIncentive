@@ -1,10 +1,14 @@
+using Asp.Versioning;
 using Dorise.Incentive.Application.Dashboard.DTOs;
 using Dorise.Incentive.Application.Dashboard.Services;
-using Dorise.Incentive.Application.Reports.DTOs;
 using Dorise.Incentive.Application.Reports.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using DashboardKpisDto = Dorise.Incentive.Application.Reports.DTOs.DashboardKpisDto;
+using MonthlyTrendDto = Dorise.Incentive.Application.Reports.DTOs.MonthlyTrendDto;
+using PendingActionDto = Dorise.Incentive.Application.Reports.DTOs.PendingActionDto;
+using PeriodComparisonDto = Dorise.Incentive.Application.Dashboard.DTOs.PeriodComparisonDto;
 
 namespace Dorise.Incentive.Api.Controllers;
 
@@ -46,7 +50,7 @@ public class DashboardController : ControllerBase
         var query = new GetDashboardQuery(topPerformerCount);
         var result = await _mediator.Send(query, cancellationToken);
 
-        return result.Match(
+        return result.Match<IActionResult>(
             success => Ok(success),
             error => BadRequest(new { Error = error }));
     }
@@ -62,7 +66,7 @@ public class DashboardController : ControllerBase
         var query = new GetDashboardQuery(0);
         var result = await _mediator.Send(query, cancellationToken);
 
-        return result.Match(
+        return result.Match<IActionResult>(
             success => Ok(success.Kpis),
             error => BadRequest(new { Error = error }));
     }
@@ -78,7 +82,7 @@ public class DashboardController : ControllerBase
         var query = new GetDashboardQuery(0);
         var result = await _mediator.Send(query, cancellationToken);
 
-        return result.Match(
+        return result.Match<IActionResult>(
             success => Ok(success.MonthlyTrend),
             error => BadRequest(new { Error = error }));
     }
@@ -96,7 +100,7 @@ public class DashboardController : ControllerBase
         var query = new GetDashboardQuery(count);
         var result = await _mediator.Send(query, cancellationToken);
 
-        return result.Match(
+        return result.Match<IActionResult>(
             success => Ok(success.TopPerformers),
             error => BadRequest(new { Error = error }));
     }
@@ -112,7 +116,7 @@ public class DashboardController : ControllerBase
         var query = new GetDashboardQuery(0);
         var result = await _mediator.Send(query, cancellationToken);
 
-        return result.Match(
+        return result.Match<IActionResult>(
             success => Ok(success.PendingActions),
             error => BadRequest(new { Error = error }));
     }

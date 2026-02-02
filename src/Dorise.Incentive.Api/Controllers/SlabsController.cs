@@ -159,7 +159,12 @@ public class SlabsController : ControllerBase
     {
         _logger.LogInformation("Reordering slabs for plan {PlanId}", planId);
 
-        var command = new ReorderSlabsCommand(planId, request.SlabOrders);
+        // Convert API DTO to Application DTO
+        var slabOrders = request.SlabOrders
+            .Select(s => new SlabOrderItem(s.SlabId, s.NewOrder))
+            .ToList();
+
+        var command = new ReorderSlabsCommand(planId, slabOrders);
         var result = await _mediator.Send(command, cancellationToken);
 
         if (!result.IsSuccess)

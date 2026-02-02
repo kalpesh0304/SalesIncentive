@@ -6,8 +6,11 @@ using Dorise.Incentive.Application.Calculations.Commands.SubmitForApproval;
 using Dorise.Incentive.Application.Calculations.Commands.VoidCalculation;
 using Dorise.Incentive.Application.Calculations.DTOs;
 using Dorise.Incentive.Application.Calculations.Queries;
+using Dorise.Incentive.Application.Common.Interfaces;
+using Dorise.Incentive.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using BatchCalculationResultDto = Dorise.Incentive.Application.Calculations.DTOs.BatchCalculationResultDto;
 
 namespace Dorise.Incentive.Api.Controllers;
 
@@ -48,7 +51,21 @@ public class CalculationsController : ControllerBase
             "Getting calculations - Page: {Page}, EmployeeId: {EmployeeId}, Status: {Status}",
             page, employeeId, status);
 
-        var query = new GetCalculationsQuery(page, pageSize, employeeId, planId, status, periodStart, periodEnd);
+        // Parse status string to CalculationStatus enum if provided
+        CalculationStatus? calculationStatus = null;
+        if (!string.IsNullOrEmpty(status) && Enum.TryParse<CalculationStatus>(status, true, out var parsedStatus))
+        {
+            calculationStatus = parsedStatus;
+        }
+
+        var query = new GetCalculationsQuery
+        {
+            Page = page,
+            PageSize = pageSize,
+            EmployeeId = employeeId,
+            IncentivePlanId = planId,
+            Status = calculationStatus
+        };
         var result = await _mediator.Send(query, cancellationToken);
 
         return Ok(result);
@@ -164,12 +181,17 @@ public class CalculationsController : ControllerBase
             "Running batch calculation for {Count} employees, period {Start} to {End}",
             request.EmployeeAchievements?.Count ?? 0, request.PeriodStart, request.PeriodEnd);
 
+        // Convert API DTO to Application DTO
+        var achievements = request.EmployeeAchievements?
+            .Select(a => new EmployeeAchievementData(a.EmployeeId, a.ActualValue))
+            .ToList();
+
         var command = new RunBatchCalculationCommand(
             request.PeriodStart,
             request.PeriodEnd,
             request.IncentivePlanId,
             request.DepartmentId,
-            request.EmployeeAchievements);
+            achievements);
 
         var result = await _mediator.Send(command, cancellationToken);
 
@@ -276,7 +298,7 @@ public class CalculationsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> RejectCalculation(
         Guid id,
-        [FromBody] RejectRequest request,
+        [FromBody] CalculationRejectRequest request,
         CancellationToken cancellationToken)
     {
         _logger.LogInformation("Rejecting calculation {CalculationId}", id);
@@ -419,7 +441,7 @@ public record BatchCalculationRequest(
 public record EmployeeAchievementItem(Guid EmployeeId, decimal ActualValue);
 
 public record ApprovalRequest(string? Comments);
-public record RejectRequest(string Reason);
+public record CalculationRejectRequest(string Reason);
 public record AdjustmentRequest(decimal NewAmount, string Reason);
 public record VoidRequest(string Reason);
 public record RecalculateRequest(decimal? NewActualValue);

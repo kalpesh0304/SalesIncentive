@@ -65,4 +65,9 @@ public interface IJobScheduleRepository : IRepository<JobSchedule>
     Task<bool> ExistsAsync(
         string scheduleName,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Deletes a job schedule.
+    /// </summary>
+    Task DeleteAsync(JobSchedule schedule, CancellationToken cancellationToken = default);
 }

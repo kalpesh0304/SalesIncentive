@@ -12,9 +12,13 @@ public class Department : AuditableEntity, IAggregateRoot
     public string Name { get; private set; } = null!;
     public string? Description { get; private set; }
     public Guid? ParentDepartmentId { get; private set; }
+    public Guid? ManagerId { get; private set; }
     public bool IsActive { get; private set; }
     public int HierarchyLevel { get; private set; }
     public string? CostCenter { get; private set; }
+
+    // Alias for ParentDepartmentId for convenience
+    public Guid? ParentId => ParentDepartmentId;
 
     // Navigation properties
     private readonly List<Employee> _employees = new();
@@ -22,6 +26,11 @@ public class Department : AuditableEntity, IAggregateRoot
 
     private readonly List<Department> _childDepartments = new();
     public IReadOnlyCollection<Department> ChildDepartments => _childDepartments.AsReadOnly();
+
+    /// <summary>
+    /// Parent department (for self-referential hierarchy).
+    /// </summary>
+    public Department? Parent { get; private set; }
 
     private Department() { } // EF Core constructor
 

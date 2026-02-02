@@ -1,6 +1,7 @@
 using Dorise.Incentive.Application.Reports.DTOs;
 using Dorise.Incentive.Application.Reports.Services;
 using Dorise.Incentive.Domain.Entities;
+using Dorise.Incentive.Domain.Enums;
 using Dorise.Incentive.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Text;
@@ -129,13 +130,13 @@ public class ReportGenerationService : IReportGenerationService
                 Department = emp != null && deptDict.TryGetValue(emp.DepartmentId, out var dept) ? dept : "Unknown",
                 PlanCode = plan?.Code ?? "N/A",
                 PlanName = plan?.Name ?? "Unknown",
-                TargetValue = c.TargetValue.Amount,
-                ActualValue = c.ActualValue.Amount,
+                TargetValue = c.TargetValue,
+                ActualValue = c.ActualValue,
                 AchievementPercentage = (decimal)c.AchievementPercentage.Value,
                 GrossIncentive = c.GrossIncentive.Amount,
                 NetIncentive = c.NetIncentive.Amount,
                 Currency = c.NetIncentive.Currency,
-                SlabApplied = c.AppliedSlabName ?? "N/A",
+                SlabApplied = c.AppliedSlab?.Name ?? "N/A",
                 Status = c.Status,
                 PaidDate = c.Status == CalculationStatus.Paid ? c.ModifiedAt : null
             };
@@ -206,8 +207,8 @@ public class ReportGenerationService : IReportGenerationService
                     DepartmentName = deptNames.GetValueOrDefault(g.Key, "Unknown"),
                     EmployeeCount = g.Count(),
                     AverageAchievement = g.Average(c => (decimal)c.AchievementPercentage.Value),
-                    TotalTarget = g.Sum(c => c.TargetValue.Amount),
-                    TotalActual = g.Sum(c => c.ActualValue.Amount),
+                    TotalTarget = g.Sum(c => c.TargetValue),
+                    TotalActual = g.Sum(c => c.ActualValue),
                     TotalIncentive = g.Sum(c => c.NetIncentive.Amount),
                     Currency = g.First().NetIncentive.Currency
                 };
@@ -223,8 +224,8 @@ public class ReportGenerationService : IReportGenerationService
                 return new PlanAchievementDto
                 {
                     PlanId = g.Key,
-                    PlanCode = planInfo.Code,
-                    PlanName = planInfo.Name,
+                    PlanCode = planInfo.Item1,
+                    PlanName = planInfo.Item2,
                     EmployeeCount = g.Count(),
                     AverageAchievement = g.Average(c => (decimal)c.AchievementPercentage.Value),
                     TotalIncentive = g.Sum(c => c.NetIncentive.Amount),
@@ -703,7 +704,7 @@ public class ReportGenerationService : IReportGenerationService
 
     private static AchievementBandDto CreateBand(string name, double min, double max, IReadOnlyList<Calculation> calculations)
     {
-        var count = calculations.Count(c => c.AchievementPercentage.Value >= min && c.AchievementPercentage.Value < max);
+        var count = calculations.Count(c => c.AchievementPercentage.Value >= (decimal)min && c.AchievementPercentage.Value < (decimal)max);
         return new AchievementBandDto
         {
             BandName = name,

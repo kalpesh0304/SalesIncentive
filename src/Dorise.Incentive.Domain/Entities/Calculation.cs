@@ -48,6 +48,17 @@ public class Calculation : AuditableEntity, IAggregateRoot
     private readonly List<Approval> _approvals = new();
     public IReadOnlyCollection<Approval> Approvals => _approvals.AsReadOnly();
 
+    /// <summary>
+    /// Notes for the calculation.
+    /// </summary>
+    public string? Notes { get; private set; }
+
+    /// <summary>
+    /// Gets whether the calculation is active (not voided or superseded).
+    /// </summary>
+    public bool IsActive => Status != CalculationStatus.Voided &&
+                            Status != CalculationStatus.Ineligible;
+
     private Calculation() { } // EF Core constructor
 
     public static Calculation Create(
@@ -255,5 +266,35 @@ public class Calculation : AuditableEntity, IAggregateRoot
     internal void AddApproval(Approval approval)
     {
         _approvals.Add(approval);
+    }
+
+    /// <summary>
+    /// Sets the calculation result from the calculation service.
+    /// </summary>
+    public void SetCalculationResult(
+        Money grossIncentive,
+        Money netIncentive,
+        Percentage achievement,
+        Guid? appliedSlabId = null)
+    {
+        if (Status != CalculationStatus.Pending)
+            throw new InvalidOperationException($"Cannot set calculation result when status is {Status}");
+
+        GrossIncentive = grossIncentive;
+        NetIncentive = netIncentive;
+        AchievementPercentage = achievement;
+        AppliedSlabId = appliedSlabId;
+        Status = CalculationStatus.Calculated;
+        CalculatedAt = DateTime.UtcNow;
+
+        AddDomainEvent(new CalculationCompletedEvent(Id, EmployeeId, NetIncentive.Amount));
+    }
+
+    /// <summary>
+    /// Sets the notes for this calculation.
+    /// </summary>
+    public void SetNotes(string? notes)
+    {
+        Notes = notes?.Trim();
     }
 }

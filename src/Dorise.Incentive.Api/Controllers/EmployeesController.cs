@@ -5,6 +5,7 @@ using Dorise.Incentive.Application.Employees.Commands.UpdateEmployee;
 using Dorise.Incentive.Application.Employees.DTOs;
 using Dorise.Incentive.Application.Employees.Queries.GetEmployeeById;
 using Dorise.Incentive.Application.Employees.Queries.GetEmployees;
+using Dorise.Incentive.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -52,7 +53,21 @@ public class EmployeesController : ControllerBase
             "Getting employees - Page: {Page}, PageSize: {PageSize}, Status: {Status}",
             page, pageSize, status);
 
-        var query = new GetEmployeesQuery(page, pageSize, status, departmentId, search);
+        // Parse status string to EmployeeStatus enum if provided
+        EmployeeStatus? employeeStatus = null;
+        if (!string.IsNullOrEmpty(status) && Enum.TryParse<EmployeeStatus>(status, true, out var parsedStatus))
+        {
+            employeeStatus = parsedStatus;
+        }
+
+        var query = new GetEmployeesQuery
+        {
+            PageNumber = page,
+            PageSize = pageSize,
+            Status = employeeStatus,
+            DepartmentId = departmentId,
+            SearchTerm = search
+        };
         var result = await _mediator.Send(query, cancellationToken);
 
         return Ok(result);
@@ -130,7 +145,7 @@ public class EmployeesController : ControllerBase
 
         return CreatedAtAction(
             nameof(GetEmployee),
-            new { id = result.Value!.Id },
+            new { id = result.Value },
             result.Value);
     }
 

@@ -52,7 +52,7 @@ public class IncentivePlanRepository : AggregateRepositoryBase<IncentivePlan>, I
             .Where(p =>
                 p.Status == PlanStatus.Active &&
                 p.EffectivePeriod.StartDate <= effectiveDate &&
-                (p.EffectivePeriod.EndDate == null || p.EffectivePeriod.EndDate >= effectiveDate))
+                p.EffectivePeriod.EndDate >= effectiveDate)
             .OrderBy(p => p.Name)
             .ToListAsync(cancellationToken);
     }
@@ -62,7 +62,7 @@ public class IncentivePlanRepository : AggregateRepositoryBase<IncentivePlan>, I
         CancellationToken cancellationToken = default)
     {
         return await DbSet
-            .Include(p => p.Slabs.OrderBy(s => s.MinThreshold))
+            .Include(p => p.Slabs.OrderBy(s => s.Order))
             .FirstOrDefaultAsync(p => p.Id == planId, cancellationToken);
     }
 
@@ -80,7 +80,7 @@ public class IncentivePlanRepository : AggregateRepositoryBase<IncentivePlan>, I
             query = query.Where(p =>
                 p.Status == PlanStatus.Active &&
                 p.EffectivePeriod.StartDate <= effectiveDate.Value &&
-                (p.EffectivePeriod.EndDate == null || p.EffectivePeriod.EndDate >= effectiveDate.Value));
+                p.EffectivePeriod.EndDate >= effectiveDate.Value);
         }
 
         return await query.OrderBy(p => p.Name).ToListAsync(cancellationToken);
@@ -100,7 +100,7 @@ public class IncentivePlanRepository : AggregateRepositoryBase<IncentivePlan>, I
         return await DbSet
             .Where(p =>
                 p.EffectivePeriod.StartDate <= period.EndDate &&
-                (p.EffectivePeriod.EndDate == null || p.EffectivePeriod.EndDate >= period.StartDate))
+                p.EffectivePeriod.EndDate >= period.StartDate)
             .OrderBy(p => p.EffectivePeriod.StartDate)
             .ToListAsync(cancellationToken);
     }
@@ -111,5 +111,44 @@ public class IncentivePlanRepository : AggregateRepositoryBase<IncentivePlan>, I
     {
         return await Context.Set<Slab>()
             .FirstOrDefaultAsync(s => s.Id == slabId, cancellationToken);
+    }
+
+    public async Task<(IReadOnlyList<IncentivePlan> Items, int TotalCount)> GetPagedAsync(
+        int page,
+        int pageSize,
+        PlanStatus? status = null,
+        PlanType? planType = null,
+        string? searchTerm = null,
+        CancellationToken cancellationToken = default)
+    {
+        var query = DbSet.AsQueryable();
+
+        if (status.HasValue)
+        {
+            query = query.Where(p => p.Status == status.Value);
+        }
+
+        if (planType.HasValue)
+        {
+            query = query.Where(p => p.PlanType == planType.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            var term = searchTerm.ToLower();
+            query = query.Where(p =>
+                p.Code.ToLower().Contains(term) ||
+                p.Name.ToLower().Contains(term));
+        }
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var items = await query
+            .OrderBy(p => p.Name)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return (items, totalCount);
     }
 }

@@ -93,7 +93,7 @@ public class PlanValidationService : IPlanValidationService
                 {
                     issues.Add(new ValidationIssue(
                         "OVERLAPPING_SLAB_RANGES",
-                        $"Slabs '{orderedSlabs[i].Name}' and '{orderedSlabs[j].Name}' have overlapping ranges",
+                        $"Slabs '{orderedSlabs[i].Description ?? $"Order {orderedSlabs[i].Order}"}' and '{orderedSlabs[j].Description ?? $"Order {orderedSlabs[j].Order}"}' have overlapping ranges",
                         "Slabs"));
                 }
             }
@@ -105,11 +105,11 @@ public class PlanValidationService : IPlanValidationService
             var current = orderedSlabs[i];
             var next = orderedSlabs[i + 1];
 
-            if (Math.Abs(current.ToPercentage.Value - next.FromPercentage.Value) > 0.01m)
+            if (Math.Abs(current.ToPercentage - next.FromPercentage) > 0.01m)
             {
                 issues.Add(new ValidationIssue(
                     "GAP_IN_SLAB_RANGES",
-                    $"Gap exists between slabs '{current.Name}' ({current.ToPercentage}%) and '{next.Name}' ({next.FromPercentage}%)",
+                    $"Gap exists between slabs '{current.Description ?? $"Order {current.Order}"}' ({current.ToPercentage}%) and '{next.Description ?? $"Order {next.Order}"}' ({next.FromPercentage}%)",
                     "Slabs"));
             }
         }
@@ -118,7 +118,7 @@ public class PlanValidationService : IPlanValidationService
         if (orderedSlabs.Count > 0)
         {
             var firstSlab = orderedSlabs[0];
-            if (firstSlab.FromPercentage.Value > plan.Target.MinimumThreshold + 1)
+            if (firstSlab.FromPercentage > plan.Target.MinimumThreshold + 1)
             {
                 issues.Add(new ValidationIssue(
                     "FIRST_SLAB_START_HIGH",
@@ -130,18 +130,18 @@ public class PlanValidationService : IPlanValidationService
         // Rule: Each slab should have valid payout
         foreach (var slab in orderedSlabs)
         {
-            if (slab.PayoutPercentage.Value <= 0 && (slab.FixedAmount == null || !slab.FixedAmount.IsPositive()))
+            if (slab.PayoutRate <= 0)
             {
                 issues.Add(new ValidationIssue(
                     "SLAB_NO_PAYOUT",
-                    $"Slab '{slab.Name}' has no payout configured (neither percentage nor fixed amount)",
+                    $"Slab '{slab.Description ?? $"Order {slab.Order}"}' has no payout rate configured",
                     $"Slabs[{slab.Order}]"));
             }
         }
 
         // Warning: Check if slabs cover up to 100% or beyond
         var lastSlab = orderedSlabs.LastOrDefault();
-        if (lastSlab != null && lastSlab.ToPercentage.Value < 100)
+        if (lastSlab != null && lastSlab.ToPercentage < 100)
         {
             issues.Add(new ValidationIssue(
                 "SLABS_INCOMPLETE_COVERAGE",
@@ -257,8 +257,8 @@ public class PlanValidationService : IPlanValidationService
 
     private bool RangesOverlap(Slab slab1, Slab slab2)
     {
-        return slab1.FromPercentage.Value < slab2.ToPercentage.Value &&
-               slab2.FromPercentage.Value < slab1.ToPercentage.Value;
+        return slab1.FromPercentage < slab2.ToPercentage &&
+               slab2.FromPercentage < slab1.ToPercentage;
     }
 
     private bool IsCritical(ValidationIssue issue)

@@ -2,6 +2,7 @@ using System.Text.Json;
 using Dorise.Incentive.Application.Audit.DTOs;
 using Dorise.Incentive.Application.Audit.Services;
 using Dorise.Incentive.Domain.Entities;
+using Dorise.Incentive.Domain.Enums;
 using Dorise.Incentive.Domain.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -272,6 +273,36 @@ public class AuditService : IAuditService
         await _auditRepository.AddAsync(auditLog, cancellationToken);
     }
 
+    public async Task LogActivityAsync(
+        string entityType,
+        string entityId,
+        string action,
+        string description,
+        Dictionary<string, object?>? oldValues = null,
+        Dictionary<string, object?>? newValues = null,
+        CancellationToken cancellationToken = default)
+    {
+        var context = GetAuditContext();
+
+        // Parse action string to AuditAction enum, default to Custom
+        var auditAction = Enum.TryParse<AuditAction>(action, true, out var parsed)
+            ? parsed
+            : AuditAction.Custom;
+
+        var auditLog = AuditLog.Create(
+            entityType: entityType,
+            entityId: Guid.TryParse(entityId, out var eid) ? eid : Guid.Empty,
+            action: auditAction,
+            userId: context.UserId,
+            userName: context.UserName,
+            reason: description,
+            correlationId: context.CorrelationId,
+            oldValues: oldValues != null ? JsonSerializer.Serialize(oldValues, JsonOptions) : null,
+            newValues: newValues != null ? JsonSerializer.Serialize(newValues, JsonOptions) : null);
+
+        await _auditRepository.AddAsync(auditLog, cancellationToken);
+    }
+
     #endregion
 
     #region Audit Queries
@@ -434,6 +465,27 @@ public class AuditService : IAuditService
             OldestEntry = oldest?.Timestamp,
             NewestEntry = newest?.Timestamp
         };
+    }
+
+    public async Task<IReadOnlyList<AuditLogDto>> GetAuditLogsAsync(
+        AuditLogSearchQuery query,
+        CancellationToken cancellationToken = default)
+    {
+        var (items, _) = await _auditRepository.SearchAsync(
+            entityType: query.EntityType,
+            entityId: query.EntityId,
+            action: query.Action,
+            userId: query.UserId,
+            fromDate: query.FromDate,
+            toDate: query.ToDate,
+            correlationId: query.CorrelationId,
+            page: query.Page,
+            pageSize: query.PageSize,
+            sortBy: query.SortBy,
+            sortDescending: query.SortDescending,
+            cancellationToken: cancellationToken);
+
+        return items.Select(MapToDto).ToList();
     }
 
     #endregion

@@ -1,7 +1,9 @@
+using Dorise.Incentive.Application.Audit.DTOs;
 using Dorise.Incentive.Application.Audit.Services;
 using Dorise.Incentive.Application.Security.DTOs;
 using Dorise.Incentive.Application.Security.Services;
 using Dorise.Incentive.Domain.Entities;
+using Dorise.Incentive.Domain.Enums;
 using Dorise.Incentive.Domain.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -100,12 +102,19 @@ public class SecurityAuditService : ISecurityAuditService
         SecurityEventSearchQuery query,
         CancellationToken cancellationToken = default)
     {
+        // Parse EventType string to AuditAction enum if provided
+        AuditAction? action = null;
+        if (!string.IsNullOrEmpty(query.EventType) && Enum.TryParse<AuditAction>(query.EventType, true, out var parsedAction))
+        {
+            action = parsedAction;
+        }
+
         var auditLogs = await _auditService.GetAuditLogsAsync(
-            new Application.Audit.DTOs.AuditLogSearchQuery
+            new AuditLogSearchQuery
             {
                 EntityType = "SecurityEvent",
-                Action = query.EventType,
-                UserId = query.UserId?.ToString(),
+                Action = action,
+                UserId = query.UserId,
                 FromDate = query.FromDate,
                 ToDate = query.ToDate,
                 Page = query.Page,
@@ -113,15 +122,15 @@ public class SecurityAuditService : ISecurityAuditService
             },
             cancellationToken);
 
-        return auditLogs.Items.Select(log => new SecurityEventDto
+        return auditLogs.Select(log => new SecurityEventDto
         {
             Id = log.Id,
-            EventType = log.Action,
+            EventType = log.Action.ToString(),
             UserId = Guid.TryParse(log.NewValues?.GetValueOrDefault("TargetUserId")?.ToString(), out var uid) ? uid : null,
             UserName = log.UserName,
             TargetUserId = log.NewValues?.GetValueOrDefault("TargetUserId")?.ToString(),
             TargetRoleId = log.NewValues?.GetValueOrDefault("RoleId")?.ToString(),
-            Description = log.Description ?? log.Action,
+            Description = log.Reason ?? log.Action.ToString(),
             IpAddress = log.NewValues?.GetValueOrDefault("IpAddress")?.ToString(),
             UserAgent = log.NewValues?.GetValueOrDefault("UserAgent")?.ToString(),
             IsSuccess = (bool?)log.NewValues?.GetValueOrDefault("IsSuccess") ?? true,

@@ -9,7 +9,7 @@ namespace Dorise.Incentive.Infrastructure.Persistence.Repositories;
 /// Repository implementation for Role entity.
 /// "I dress myself!" - Roles dress up users with permissions!
 /// </summary>
-public class RoleRepository : Repository<Role>, IRoleRepository
+public class RoleRepository : RepositoryBase<Role>, IRoleRepository
 {
     public RoleRepository(IncentiveDbContext context) : base(context)
     {
@@ -17,14 +17,14 @@ public class RoleRepository : Repository<Role>, IRoleRepository
 
     public async Task<Role?> GetByNameAsync(string name, CancellationToken cancellationToken = default)
     {
-        return await _context.Roles
+        return await Context.Roles
             .Include(r => r.UserRoles)
             .FirstOrDefaultAsync(r => r.Name == name, cancellationToken);
     }
 
     public async Task<IReadOnlyList<Role>> GetActiveRolesAsync(CancellationToken cancellationToken = default)
     {
-        return await _context.Roles
+        return await Context.Roles
             .Where(r => r.IsActive)
             .OrderBy(r => r.Name)
             .ToListAsync(cancellationToken);
@@ -32,7 +32,7 @@ public class RoleRepository : Repository<Role>, IRoleRepository
 
     public async Task<IReadOnlyList<Role>> GetSystemRolesAsync(CancellationToken cancellationToken = default)
     {
-        return await _context.Roles
+        return await Context.Roles
             .Where(r => r.IsSystem)
             .OrderBy(r => r.Name)
             .ToListAsync(cancellationToken);
@@ -42,7 +42,7 @@ public class RoleRepository : Repository<Role>, IRoleRepository
         Permission permission,
         CancellationToken cancellationToken = default)
     {
-        var roles = await _context.Roles
+        var roles = await Context.Roles
             .Where(r => r.IsActive)
             .ToListAsync(cancellationToken);
 
@@ -55,7 +55,7 @@ public class RoleRepository : Repository<Role>, IRoleRepository
         Guid? excludeId = null,
         CancellationToken cancellationToken = default)
     {
-        var query = _context.Roles.Where(r => r.Name == name);
+        var query = Context.Roles.Where(r => r.Name == name);
 
         if (excludeId.HasValue)
         {
@@ -64,13 +64,19 @@ public class RoleRepository : Repository<Role>, IRoleRepository
 
         return await query.AnyAsync(cancellationToken);
     }
+
+    public Task DeleteAsync(Role role, CancellationToken cancellationToken = default)
+    {
+        Context.Roles.Remove(role);
+        return Task.CompletedTask;
+    }
 }
 
 /// <summary>
 /// Repository implementation for UserRole entity.
 /// "That's my sandbox. I'm not allowed to go in the deep end." - Each user has their role boundaries!
 /// </summary>
-public class UserRoleRepository : Repository<UserRole>, IUserRoleRepository
+public class UserRoleRepository : RepositoryBase<UserRole>, IUserRoleRepository
 {
     public UserRoleRepository(IncentiveDbContext context) : base(context)
     {
@@ -80,7 +86,7 @@ public class UserRoleRepository : Repository<UserRole>, IUserRoleRepository
         Guid userId,
         CancellationToken cancellationToken = default)
     {
-        return await _context.UserRoles
+        return await Context.UserRoles
             .Include(ur => ur.Role)
             .Where(ur => ur.UserId == userId)
             .ToListAsync(cancellationToken);
@@ -90,7 +96,7 @@ public class UserRoleRepository : Repository<UserRole>, IUserRoleRepository
         Guid userId,
         CancellationToken cancellationToken = default)
     {
-        return await _context.UserRoles
+        return await Context.UserRoles
             .Include(ur => ur.Role)
             .Where(ur => ur.UserId == userId && ur.IsActive)
             .ToListAsync(cancellationToken);
@@ -100,7 +106,7 @@ public class UserRoleRepository : Repository<UserRole>, IUserRoleRepository
         Guid roleId,
         CancellationToken cancellationToken = default)
     {
-        return await _context.UserRoles
+        return await Context.UserRoles
             .Include(ur => ur.Role)
             .Where(ur => ur.RoleId == roleId)
             .ToListAsync(cancellationToken);
@@ -111,7 +117,7 @@ public class UserRoleRepository : Repository<UserRole>, IUserRoleRepository
         Guid roleId,
         CancellationToken cancellationToken = default)
     {
-        return await _context.UserRoles
+        return await Context.UserRoles
             .Include(ur => ur.Role)
             .FirstOrDefaultAsync(ur => ur.UserId == userId && ur.RoleId == roleId, cancellationToken);
     }
@@ -121,7 +127,7 @@ public class UserRoleRepository : Repository<UserRole>, IUserRoleRepository
         Guid roleId,
         CancellationToken cancellationToken = default)
     {
-        return await _context.UserRoles
+        return await Context.UserRoles
             .AnyAsync(ur =>
                 ur.UserId == userId &&
                 ur.RoleId == roleId &&
@@ -135,7 +141,7 @@ public class UserRoleRepository : Repository<UserRole>, IUserRoleRepository
         string roleName,
         CancellationToken cancellationToken = default)
     {
-        return await _context.UserRoles
+        return await Context.UserRoles
             .Include(ur => ur.Role)
             .AnyAsync(ur =>
                 ur.UserId == userId &&
@@ -148,7 +154,7 @@ public class UserRoleRepository : Repository<UserRole>, IUserRoleRepository
     public async Task<IReadOnlyList<UserRole>> GetExpiredAssignmentsAsync(
         CancellationToken cancellationToken = default)
     {
-        return await _context.UserRoles
+        return await Context.UserRoles
             .Include(ur => ur.Role)
             .Where(ur => ur.ExpiresAt != null && ur.ExpiresAt < DateTime.UtcNow)
             .ToListAsync(cancellationToken);
@@ -158,7 +164,7 @@ public class UserRoleRepository : Repository<UserRole>, IUserRoleRepository
         DateTime expiringBefore,
         CancellationToken cancellationToken = default)
     {
-        return await _context.UserRoles
+        return await Context.UserRoles
             .Include(ur => ur.Role)
             .Where(ur =>
                 ur.IsActive &&
@@ -172,13 +178,13 @@ public class UserRoleRepository : Repository<UserRole>, IUserRoleRepository
         Permission permission,
         CancellationToken cancellationToken = default)
     {
-        var roles = await _context.Roles
+        var roles = await Context.Roles
             .Where(r => r.IsActive)
             .ToListAsync(cancellationToken);
 
         var roleIds = roles.Where(r => r.HasPermission(permission)).Select(r => r.Id).ToHashSet();
 
-        return await _context.UserRoles
+        return await Context.UserRoles
             .Where(ur =>
                 ur.IsActive &&
                 (ur.ExpiresAt == null || ur.ExpiresAt > DateTime.UtcNow) &&
@@ -190,10 +196,10 @@ public class UserRoleRepository : Repository<UserRole>, IUserRoleRepository
 
     public async Task RemoveAllUserRolesAsync(Guid userId, CancellationToken cancellationToken = default)
     {
-        var userRoles = await _context.UserRoles
+        var userRoles = await Context.UserRoles
             .Where(ur => ur.UserId == userId)
             .ToListAsync(cancellationToken);
 
-        _context.UserRoles.RemoveRange(userRoles);
+        Context.UserRoles.RemoveRange(userRoles);
     }
 }

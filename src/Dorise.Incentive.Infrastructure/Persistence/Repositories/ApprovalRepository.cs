@@ -263,4 +263,17 @@ public class ApprovalRepository : AggregateRepositoryBase<Approval>, IApprovalRe
             ByLevel = byLevel
         };
     }
+
+    public async Task<IReadOnlyList<Approval>> GetPendingAsync(CancellationToken cancellationToken = default)
+    {
+        return await DbSet
+            .Include(a => a.Calculation)
+                .ThenInclude(c => c!.Employee)
+            .Include(a => a.Calculation)
+                .ThenInclude(c => c!.IncentivePlan)
+            .Include(a => a.Approver)
+            .Where(a => a.Status == ApprovalStatus.Pending)
+            .OrderBy(a => a.CreatedAt)
+            .ToListAsync(cancellationToken);
+    }
 }

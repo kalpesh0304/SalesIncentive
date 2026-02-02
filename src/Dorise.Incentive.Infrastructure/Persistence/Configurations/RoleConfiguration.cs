@@ -34,12 +34,12 @@ public class RoleConfiguration : IEntityTypeConfiguration<Role>
             .IsRequired()
             .HasConversion<long>(); // Store as long for flags enum
 
-        // Store extended permissions as JSON
-        builder.Property("_extendedPermissions")
+        // Store extended permissions as comma-separated integers
+        builder.Property<List<ExtendedPermission>>("_extendedPermissions")
             .HasColumnName("ExtendedPermissions")
             .HasConversion(
-                v => string.Join(',', v.Select(e => ((int)e).ToString())),
-                v => string.IsNullOrEmpty(v)
+                (List<ExtendedPermission> v) => string.Join(',', v.Select(e => ((int)e).ToString())),
+                (string v) => string.IsNullOrEmpty(v)
                     ? new List<ExtendedPermission>()
                     : v.Split(',', StringSplitOptions.RemoveEmptyEntries)
                         .Select(s => (ExtendedPermission)int.Parse(s))

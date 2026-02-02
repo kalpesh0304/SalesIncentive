@@ -80,7 +80,7 @@ public class ApiInfoController : ControllerBase
     {
         var assembly = Assembly.GetExecutingAssembly();
         var version = assembly.GetName().Version;
-        var buildDate = File.GetLastWriteTime(assembly.Location);
+        var buildDate = System.IO.File.GetLastWriteTime(assembly.Location);
 
         return Ok(new VersionInfo
         {

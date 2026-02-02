@@ -8,7 +8,7 @@ namespace Dorise.Incentive.Domain.Entities;
 /// Represents an approval request/response for a calculation.
 /// "I sleep in a drawer!" - And approvals sleep in the workflow!
 /// </summary>
-public class Approval : AuditableEntity
+public class Approval : AuditableEntity, IAggregateRoot
 {
     public Guid CalculationId { get; private set; }
     public Guid ApproverId { get; private set; }

@@ -96,6 +96,11 @@ public interface IApprovalRepository : IAggregateRepository<Approval>
         DateTime? startDate,
         DateTime? endDate,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets all pending approvals (admin view without approver filter).
+    /// </summary>
+    Task<IReadOnlyList<Approval>> GetPendingAsync(CancellationToken cancellationToken = default);
 }
 
 /// <summary>

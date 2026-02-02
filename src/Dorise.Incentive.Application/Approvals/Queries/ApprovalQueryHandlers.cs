@@ -1,5 +1,6 @@
 using Dorise.Incentive.Application.Approvals.DTOs;
 using Dorise.Incentive.Application.Common.Interfaces;
+using Dorise.Incentive.Domain.Entities;
 using Dorise.Incentive.Domain.Enums;
 using Dorise.Incentive.Domain.Interfaces;
 using Microsoft.Extensions.Logging;

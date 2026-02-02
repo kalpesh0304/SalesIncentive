@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Dorise.Incentive.Application.Reports.DTOs;
 using Dorise.Incentive.Application.Reports.Queries;
 using Dorise.Incentive.Application.Reports.Services;
@@ -48,7 +49,7 @@ public class ReportsController : ControllerBase
         var query = new GetPayoutReportQuery(periodStart, periodEnd, departmentId, planId);
         var result = await _mediator.Send(query, cancellationToken);
 
-        return result.Match(
+        return result.Match<IActionResult>(
             success => Ok(success),
             error => BadRequest(new { Error = error }));
     }
@@ -70,7 +71,7 @@ public class ReportsController : ControllerBase
         var query = new ExportPayoutReportQuery(periodStart, periodEnd, format, departmentId, planId);
         var result = await _mediator.Send(query, cancellationToken);
 
-        return result.Match(
+        return result.Match<IActionResult>(
             export => File(export.Content, export.ContentType, export.FileName),
             error => BadRequest(new { Error = error }));
     }
@@ -90,7 +91,7 @@ public class ReportsController : ControllerBase
         var query = new GetAchievementSummaryQuery(periodStart, periodEnd, departmentId);
         var result = await _mediator.Send(query, cancellationToken);
 
-        return result.Match(
+        return result.Match<IActionResult>(
             success => Ok(success),
             error => BadRequest(new { Error = error }));
     }
@@ -111,7 +112,7 @@ public class ReportsController : ControllerBase
         var query = new ExportAchievementSummaryQuery(periodStart, periodEnd, format, departmentId);
         var result = await _mediator.Send(query, cancellationToken);
 
-        return result.Match(
+        return result.Match<IActionResult>(
             export => File(export.Content, export.ContentType, export.FileName),
             error => BadRequest(new { Error = error }));
     }
@@ -141,7 +142,7 @@ public class ReportsController : ControllerBase
 
         var result = await _mediator.Send(query, cancellationToken);
 
-        return result.Match(
+        return result.Match<IActionResult>(
             success => Ok(success),
             error => BadRequest(new { Error = error }));
     }
@@ -162,7 +163,7 @@ public class ReportsController : ControllerBase
         var query = new GetPeriodComparisonQuery(periods, request.DepartmentId);
         var result = await _mediator.Send(query, cancellationToken);
 
-        return result.Match(
+        return result.Match<IActionResult>(
             success => Ok(success),
             error => BadRequest(new { Error = error }));
     }
@@ -184,7 +185,7 @@ public class ReportsController : ControllerBase
         var query = new ExportCalculationsQuery(periodStart, periodEnd, format, departmentId, planId);
         var result = await _mediator.Send(query, cancellationToken);
 
-        return result.Match(
+        return result.Match<IActionResult>(
             export => File(export.Content, export.ContentType, export.FileName),
             error => BadRequest(new { Error = error }));
     }

@@ -1,6 +1,7 @@
 using Dorise.Incentive.Application.DataTransfer.DTOs;
 using Dorise.Incentive.Application.DataTransfer.Services;
 using Dorise.Incentive.Domain.Entities;
+using Dorise.Incentive.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace Dorise.Incentive.Infrastructure.DataTransfer;

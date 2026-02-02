@@ -69,9 +69,9 @@ public class AssignPlanToEmployeeCommandHandler : ICommandHandler<AssignPlanToEm
             request.EffectiveFrom,
             request.EffectiveTo ?? plan.EffectivePeriod.EndDate);
 
-        foreach (var existing in existingAssignments)
+        foreach (var existing in existingAssignments.Where(a => a.IsActive))
         {
-            if (existing.OverlapsWith(effectivePeriod))
+            if (existing.EffectivePeriod.Overlaps(effectivePeriod))
             {
                 return Result<PlanAssignmentDto>.Failure(
                     $"Assignment overlaps with existing assignment (ID: {existing.Id})",
@@ -84,9 +84,9 @@ public class AssignPlanToEmployeeCommandHandler : ICommandHandler<AssignPlanToEm
             request.EmployeeId,
             request.IncentivePlanId,
             request.EffectiveFrom,
-            request.EffectiveTo,
+            request.EffectiveTo ?? plan.EffectivePeriod.EndDate,
             request.CustomTarget,
-            request.CustomTargetUnit,
+            weightagePercentage: null,
             request.Notes);
 
         await _unitOfWork.PlanAssignments.AddAsync(assignment, cancellationToken);

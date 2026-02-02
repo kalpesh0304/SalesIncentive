@@ -56,6 +56,13 @@ public class Result<T> : Result
         Value = value;
     }
 
+    public static Result<T> Success(T value) => new(value, true, null, null);
+    public static new Result<T> Failure(string error, string? errorCode = null) => new(default, false, error, errorCode);
+    public static new Result<T> NotFound(string entityName, object id) =>
+        Failure($"{entityName} with ID '{id}' was not found.", "NOT_FOUND");
+    public static new Result<T> ValidationError(string message) =>
+        Failure(message, "VALIDATION_ERROR");
+
     public static implicit operator Result<T>(T value) => Success(value);
 
     public TResult Match<TResult>(Func<T, TResult> onSuccess, Func<string, TResult> onFailure)
@@ -66,26 +73,29 @@ public class Result<T> : Result
 
 /// <summary>
 /// Paged result for queries that return lists.
+/// "Go banana!" - And go fetch those pages!
 /// </summary>
 /// <typeparam name="T">The type of items</typeparam>
 public class PagedResult<T>
 {
-    public IReadOnlyList<T> Items { get; }
-    public int TotalCount { get; }
-    public int PageNumber { get; }
-    public int PageSize { get; }
-    public int TotalPages => (int)Math.Ceiling(TotalCount / (double)PageSize);
-    public bool HasPreviousPage => PageNumber > 1;
-    public bool HasNextPage => PageNumber < TotalPages;
+    public IReadOnlyList<T> Items { get; init; } = Array.Empty<T>();
+    public int TotalCount { get; init; }
+    public int Page { get; init; } = 1;
+    public int PageSize { get; init; } = 20;
+    public int TotalPages => PageSize > 0 ? (int)Math.Ceiling(TotalCount / (double)PageSize) : 0;
+    public bool HasPreviousPage => Page > 1;
+    public bool HasNextPage => Page < TotalPages;
 
-    public PagedResult(IReadOnlyList<T> items, int totalCount, int pageNumber, int pageSize)
+    public PagedResult() { }
+
+    public PagedResult(IReadOnlyList<T> items, int totalCount, int page, int pageSize)
     {
         Items = items;
         TotalCount = totalCount;
-        PageNumber = pageNumber;
+        Page = page;
         PageSize = pageSize;
     }
 
-    public static PagedResult<T> Empty(int pageNumber = 1, int pageSize = 20) =>
-        new(Array.Empty<T>(), 0, pageNumber, pageSize);
+    public static PagedResult<T> Empty(int page = 1, int pageSize = 20) =>
+        new(Array.Empty<T>(), 0, page, pageSize);
 }

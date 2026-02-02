@@ -75,7 +75,7 @@ public class CheckPlanEligibilityQueryHandler : IRequestHandler<CheckPlanEligibi
                 .Select(c => $"{c.Name}: {c.Description}")
                 .ToList(),
             HasExistingAssignment = activeAssignment != null,
-            ExistingAssignmentEndDate = activeAssignment?.EffectiveTo
+            ExistingAssignmentEndDate = activeAssignment?.EffectivePeriod.EndDate
         };
     }
 }
