@@ -120,21 +120,6 @@ resource appService 'Microsoft.Web/sites@2023-01-01' = {
   }
 }
 
-// Grant App Service access to Key Vault
-resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
-  name: keyVaultName
-}
-
-resource keyVaultAccessPolicy 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  scope: keyVault
-  name: guid(keyVault.id, appService.id, 'Key Vault Secrets User')
-  properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6') // Key Vault Secrets User
-    principalId: appService.identity.principalId
-    principalType: 'ServicePrincipal'
-  }
-}
-
 // Staging slot (for non-dev environments)
 resource stagingSlot 'Microsoft.Web/sites/slots@2023-01-01' = if (environment != 'dev') {
   parent: appService
